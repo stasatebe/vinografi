@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vinkartan</title>
+<title>Vinografi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -229,7 +229,7 @@
     .mobile-search-bar{
       display:block;position:fixed;left:0;right:0;top:56px;z-index:1250;
       background:var(--panel);border-bottom:1px solid var(--line-strong);
-      padding:calc(var(--unit)*1.5);transform:translateY(-120%);transition:transform 0.2s ease;
+      padding:calc(var(--unit)*1.5);transform:translateY(-100vh);transition:transform 0.2s ease;
     }
     .mobile-search-bar.open{transform:translateY(0);}
     .mobile-search-bar .header-search{max-width:none;}
@@ -273,7 +273,7 @@
 <body>
 <div class="app">
   <header>
-    <div class="wordmark">Vinkartan</div>
+    <div class="wordmark">Vinografi</div>
     <div class="header-search-wrap" id="headerSearchWrap">
       <input type="text" class="header-search" id="searchInput" placeholder="Sök producent, vin eller region…" autocomplete="off">
       <div class="search-results" id="searchResults"></div>
@@ -409,9 +409,12 @@
         <div class="panel-topbar"><span>Om kartan</span><button class="panel-close" id="aboutClose">Stäng ✕</button></div>
         <div class="about-body">
           <h2>Vad är det här?</h2>
-          <p>Vinkartan visar var i världen Systembolagets viner faktiskt kommer ifrån. Zooma in och se vingården, byn eller kusten bakom flaskan.</p>
-          <p>Kartan visar inte allt Systembolaget säljer. Den visar de producenter vi kunnat hitta en plats för — oftast mindre, oberoende vingårdar snarare än stora industriella tillverkare.</p>
-          <div class="cite">Platsdata är geokodad utifrån offentligt tillgänglig information om producenter, med hjälp av LocationIQ. Inte alla producenter har kunnat lokaliseras.<br><br>Vinregioner: Candiago, S., Tscholl, S., Bassani, L., Fraga, H., Egarter Vigl, L. (2022). A geospatial inventory of regulatory information for wine Protected Designations of Origin in Europe. Scientific Data 9, 394. CC BY 4.0.</div>
+          <p>Hejhej! Vi har gjort en karta som visar var olika viner och producenter kommer ifrån, som ett komplement till Systembolagets hemsida.</p>
+          <p>Det här är ett work in progress! Systembolaget har inte koordinater för producenterna, så vi har försökt hitta och placera dem så rätt som möjligt. En del är hämtat via LocationIQ, och mycket har gjorts manuellt (jag har googlat ca 2000 gånger :)))). Det är några tusen producenter, så saker kan ha blivit fel.</p>
+          <p>Ser du något som är fel? Säg till, så fixar vi det! Och hittar du något som ser knasigt ut, eller har du ris, ros eller idéer — slå gärna en signal!</p>
+          <div class="info-link-row"><a href="mailto:stasatebe@outlook.com?subject=Feedback%20p%C3%A5%20Vinografi"><span>Skicka feedback</span><span class="arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.1"/></svg></span></a></div>
+          <p>Vi har gjort det här på fritiden, helt gratis och utan spons eller vinstintresse. Hoppas ni tycker det är kul och användbart :)</p>
+          <div class="cite">Vinregioner: Candiago, S., Tscholl, S., Bassani, L., Fraga, H., Egarter Vigl, L. (2022). A geospatial inventory of regulatory information for wine Protected Designations of Origin in Europe. Scientific Data 9, 394. CC BY 4.0.</div>
         </div>
       </div>
     </div>
@@ -473,7 +476,11 @@ function fmtNum(n) {
 }
 const ARROW_SVG = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.1"/></svg>';
 
-const NEW_RELEASE_CUTOFF = new Date();
+let latestReleaseDate = new Date(0);
+PRODUCERS.forEach(p => (p.wines || []).forEach(w => {
+  if (w.lanserad) { const d = new Date(w.lanserad); if (d > latestReleaseDate) latestReleaseDate = d; }
+}));
+const NEW_RELEASE_CUTOFF = new Date(latestReleaseDate);
 NEW_RELEASE_CUTOFF.setDate(NEW_RELEASE_CUTOFF.getDate() - 30);
 
 let VINTAGE_MIN = 9999, VINTAGE_MAX = 0;
@@ -1098,7 +1105,7 @@ function selectSearchResult(item) {
   if (item.type === 'region') {
     map.fitBounds(boundsOfFeature(item.feature), { padding: [40, 40] });
   } else {
-    map.setView([item.lat, item.lon], map.getZoom());
+    map.setView([item.lat, item.lon], Math.max(map.getZoom(), 13));
     const marker = markerByName.get(item.producer);
     if (marker) selectProducer(item.producer, marker);
   }
@@ -1149,20 +1156,24 @@ function wireSearch(inputId, resultsId, onSelect) {
     }
   });
   document.addEventListener('click', (e) => {
+    if (Date.now() - lastSearchToggleTime < 400) return;
     if (!input.contains(e.target) && !results.contains(e.target)) results.classList.remove('open');
   });
 }
+let lastSearchToggleTime = 0;
 wireSearch('searchInput', 'searchResults');
 wireSearch('searchInputM', 'searchResultsM', () => {
   document.getElementById('mobileSearchBar').classList.remove('open');
   document.getElementById('searchToggleM').classList.remove('active');
 });
 
-document.getElementById('searchToggleM').addEventListener('click', () => {
+document.getElementById('searchToggleM').addEventListener('click', (e) => {
+  e.stopPropagation();
+  lastSearchToggleTime = Date.now();
   const bar = document.getElementById('mobileSearchBar');
   const open = bar.classList.toggle('open');
   document.getElementById('searchToggleM').classList.toggle('active', open);
-  if (open) document.getElementById('searchInputM').focus();
+  if (open) setTimeout(() => document.getElementById('searchInputM').focus(), 220);
 });
 
 rebuildFacets();
