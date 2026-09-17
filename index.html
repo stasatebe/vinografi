@@ -107,6 +107,9 @@
   .dual-range{position:relative;height:32px;}
   .dr-track{position:absolute;left:0;right:0;height:1px;background:var(--line-strong);top:50%;}
   .dr-fill{position:absolute;height:2px;background:var(--blue);top:50%;margin-top:-0.5px;}
+  #rabattFill{height:3px;}
+  #rabattMin::-webkit-slider-thumb, #rabattMax::-webkit-slider-thumb{background:#7A0000;box-shadow:0 0 0 1px #7A0000;}
+  #rabattMin::-moz-range-thumb, #rabattMax::-moz-range-thumb{background:#7A0000;box-shadow:0 0 0 1px #7A0000;}
   .dr-input{position:absolute;left:0;right:0;width:100%;top:6px;margin:0;height:20px;-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;}
   .dr-input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:10px;height:10px;background:var(--ink);border:2px solid var(--panel);box-shadow:0 0 0 1px var(--ink);cursor:pointer;margin-top:0;}
   .dr-input::-moz-range-thumb{pointer-events:auto;width:10px;height:10px;background:var(--ink);border:2px solid var(--panel);box-shadow:0 0 0 1px var(--ink);cursor:pointer;border-radius:0;}
@@ -365,7 +368,7 @@
           </div>
           <div class="range-row secret-range" id="rabattRange">
             <div class="range-row-head"><span class="l">Rabatt</span><span class="rv"><span class="rv-min" id="rabattMinLabel"></span> – <span class="rv-max" id="rabattMaxLabel"></span>%</span></div>
-            <div class="dual-range">
+            <div class="dual-range" id="rabattSlider">
               <div class="dr-track"></div><div class="dr-fill" id="rabattFill"></div>
               <input type="range" class="dr-input" id="rabattMin">
               <input type="range" class="dr-input" id="rabattMax">
@@ -493,7 +496,6 @@ REGIONS.features.forEach(f => {
 const NO_VINTAGE = '__none__';
 const IS_MOBILE = window.innerWidth <= 900;
 let SECRET_UNLOCKED = false;
-try { SECRET_UNLOCKED = localStorage.getItem('vinografi_secret') === '1'; } catch (e) {}
 let EXTRA_ONLY = false;
 
 function slugify(s) {
@@ -998,6 +1000,12 @@ initDualRange(
     DISCOUNT_MIN = a; DISCOUNT_MAX = b;
     document.getElementById('rabattMinLabel').textContent = Math.round(a);
     document.getElementById('rabattMaxLabel').textContent = Math.round(b);
+    const track = document.getElementById('rabattSlider');
+    const fill = document.getElementById('rabattFill');
+    const trackWidth = track.clientWidth;
+    fill.style.backgroundImage = 'linear-gradient(to right, #FFC1C1, #FF2E2E, #7A0000)';
+    fill.style.backgroundSize = trackWidth + 'px 100%';
+    fill.style.backgroundPosition = '-' + (parseFloat(fill.style.left) / 100 * trackWidth) + 'px 0';
     render();
   }
 );
@@ -1257,9 +1265,13 @@ document.getElementById('searchToggleM').addEventListener('click', (e) => {
 // ---------------- HIDDEN EXTRAPRIS FEATURE ----------------
 function setSecretUnlocked(unlocked) {
   SECRET_UNLOCKED = unlocked;
-  try { localStorage.setItem('vinografi_secret', unlocked ? '1' : '0'); } catch (e) {}
   document.body.classList.toggle('secret-unlocked', unlocked);
-  if (!unlocked) {
+  if (unlocked) {
+    EXTRA_ONLY = true;
+    const seg = document.getElementById('extraToggle');
+    seg.dataset.val = 'pa';
+    seg.querySelectorAll('.seg-opt').forEach(o => o.classList.toggle('active', o.dataset.val === 'pa'));
+  } else {
     EXTRA_ONLY = false;
     const seg = document.getElementById('extraToggle');
     seg.dataset.val = 'av';
@@ -1270,7 +1282,6 @@ function setSecretUnlocked(unlocked) {
   }
   render();
 }
-if (SECRET_UNLOCKED) document.body.classList.add('secret-unlocked');
 
 const secretMarker = L.circleMarker([59.70603609708796, 14.543204397251872], markerStyle(null));
 secretMarker.addTo(map);
