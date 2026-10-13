@@ -202,6 +202,8 @@
   .wine-entry-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
   .wine-entry-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--blue);border:1px solid var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
   .wine-entry-sale{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--panel);background:var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
+.wine-entry-out{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);border:1px solid var(--ink-soft);padding:1px 5px;margin-left:calc(var(--unit)*1);}
+.wine-entry.is-out .wine-entry-body{opacity:0.6;}
   .secret-toggle{display:none;}
   .secret-prompt{display:none;position:fixed;inset:0;background:rgba(30,30,25,0.45);z-index:2000;align-items:center;justify-content:center;}
   .secret-prompt.open{display:flex;}
@@ -685,6 +687,7 @@ function wineEntry(w) {
   const badge = isNew ? '<span class="wine-entry-badge">Nyhet</span>' : '';
   const showSale = SECRET_UNLOCKED && !!w.extrapris;
   const saleBadge = showSale ? '<span class="wine-entry-sale">\u2013' + Math.abs(w.extrapris.pct) + '%</span>' : '';
+  const outBadge = w.slut ? '<span class="wine-entry-out">Tillf\u00e4lligt slut</span>' : '';
   const link = w.varunr && w.namn ? `https://www.systembolaget.se/produkt/vin/${slugify(w.namn)}-${w.varunr}/` : null;
   const meta = [];
   meta.push(w.argang || 'Ingen \u00e5rg\u00e5ng');
@@ -697,10 +700,10 @@ function wineEntry(w) {
     : '';
   const tag = link ? 'a' : 'div';
   const linkAttrs = link ? ' href="' + link + '" target="_blank" rel="noopener"' : '';
-  let html = '<' + tag + ' class="wine-entry' + (showSale ? ' has-sale' : '') + '"' + linkAttrs + '>';
+  let html = '<' + tag + ' class="wine-entry' + (showSale ? ' has-sale' : '') + (w.slut ? ' is-out' : '') + '"' + linkAttrs + '>';
   html += thumb;
   html += '<div class="wine-entry-body">';
-  html += '<div class="wine-entry-top"><span class="wine-entry-title">' + escapeHtml(w.namn) + badge + saleBadge + '</span>' + (link ? '<span class="wine-entry-arrow">' + ARROW_SVG + '</span>' : '') + '</div>';
+  html += '<div class="wine-entry-top"><span class="wine-entry-title">' + escapeHtml(w.namn) + badge + saleBadge + outBadge + '</span>' + (link ? '<span class="wine-entry-arrow">' + ARROW_SVG + '</span>' : '') + '</div>';
   if (w.namn2) html += '<div class="wine-entry-sub">' + escapeHtml(w.namn2) + '</div>';
   if (w.druvor) html += '<div class="wine-entry-grapes">' + escapeHtml(w.druvor) + '</div>';
   html += '<div class="wine-entry-meta">' + escapeHtml(meta.join(' \u00b7 ')) + '</div>';
