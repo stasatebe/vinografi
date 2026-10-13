@@ -1,0 +1,65 @@
+name: Uppdatera Vinografi
+
+on:
+  schedule:
+    - cron: '0 3 * * *'      # varje natt kl 03 UTC (kl 04–05 svensk tid), efter att datan uppdaterats
+  push:
+    branches: [main]         # när du laddar upp något (t.ex. en ifylld googla-lista eller ny index.html)
+  workflow_dispatch:         # knappen "Run workflow" under fliken Actions
+
+permissions:
+  contents: write            # för att spara registret och googla-listan i repot
+  pages: write
+  id-token: write
+
+concurrency:
+  group: vinografi
+  cancel-in-progress: false
+
+jobs:
+  uppdatera:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicera.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installera bibliotek
+        run: pip install pandas openpyxl requests
+
+      - name: Kör uppdateringen
+        env:
+          LOCATIONIQ_API_KEY: ${{ secrets.LOCATIONIQ_API_KEY }}
+        run: python scripts/uppdatera.py
+
+      - name: Spara ändringar i repot (register, googla-lista)
+        run: |
+          git config user.name "vinografi-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A data
+          if git diff --cached --quiet; then
+            echo "Inga ändringar att spara."
+          else
+            git commit -m "Automatisk uppdatering $(date +%F)"
+            git push
+          fi
+
+      - name: Spara masterfilen (ladda ner under Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: masterfil
+          path: master/
+          retention-days: 7
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publicera hemsidan
+        id: publicera
+        uses: actions/deploy-pages@v4
