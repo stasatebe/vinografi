@@ -1,6 +1,6 @@
-## ✅ Inga nya producenter att googla just nu
+## 🍷 3 nya producenter väntar på att googlas
 
-*Listan ändrades senast 2026-10-13. Hemsidan uppdateras automatiskt varje natt.*
+*Listan ändrades senast 2026-10-15. Hemsidan uppdateras automatiskt varje natt.*
 
 ### Så här gör du
 1. Klicka på **att_googla.xlsx** här ovanför och sedan på nedladdningsknappen (pil nedåt, "Download raw file").
