@@ -30,7 +30,7 @@
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;font-size:var(--fs);line-height:1.5;overflow:hidden;-webkit-tap-highlight-color:transparent;}
   a{-webkit-tap-highlight-color:transparent;}
   button,input{font-family:inherit;}
-  .app{display:flex;flex-direction:column;height:100vh;width:100%;}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;}
 
   header{display:grid;grid-template-columns:var(--col) 1fr auto;border-bottom:1px solid var(--line-strong);height:var(--header-h);flex:0 0 auto;}
   .wordmark{display:flex;align-items:center;padding:0 calc(var(--unit)*5);font-size:28px;font-weight:600;letter-spacing:-0.01em;border-right:1px solid var(--line-strong);}
@@ -527,6 +527,14 @@ function isNewRelease(w) {
   return d.getMonth() === NEW_RELEASE_MONTH && d.getFullYear() === NEW_RELEASE_YEAR;
 }
 
+// Rabatt i procent med decimaler, räknad från gammalt och nytt pris
+function exactSalePct(w) {
+  const e = w && w.extrapris;
+  if (!e) return 0;
+  const o = parseFloat(e.old), n = parseFloat(e.new);
+  if (o > 0 && !isNaN(n)) return Math.max(0, (o - n) / o * 100);
+  return Math.abs(e.pct || 0);
+}
 let VINTAGE_MIN = 9999, VINTAGE_MAX = 0;
 
 PRODUCERS.forEach(p => {
@@ -538,7 +546,8 @@ PRODUCERS.forEach(p => {
   p.hasNoVintageWine = (p.wines || []).some(w => !w.argang);
   years.forEach(y => { if (y < VINTAGE_MIN) VINTAGE_MIN = y; if (y > VINTAGE_MAX) VINTAGE_MAX = y; });
   p.has_new = (p.wines || []).some(w => isNewRelease(w));
-  p.maxDiscountPct = Math.max(0, ...(p.wines || []).filter(w => w.extrapris).map(w => Math.abs(w.extrapris.pct)));
+  p.hasSale = (p.wines || []).some(w => w.extrapris);
+  p.maxDiscountPct = Math.max(0, ...(p.wines || []).filter(w => w.extrapris).map(w => exactSalePct(w)));
 });
 if (VINTAGE_MIN > VINTAGE_MAX) { VINTAGE_MIN = 1964; VINTAGE_MAX = 2026; }
 let DISCOUNT_BOUND_MAX = 0;
@@ -590,8 +599,8 @@ const topoLayer = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/ser
 map.createPane('labelsPane');
 map.getPane('labelsPane').style.zIndex = 250;
 map.getPane('labelsPane').style.pointerEvents = 'none';
-const labelsOverlay = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
-  maxZoom: 19, noWrap: true, subdomains: 'abcd', pane: 'labelsPane', attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+const labelsOverlay = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19, noWrap: true, pane: 'labelsPane', attribution: 'Ortnamn &copy; Esri'
 });
 const satTint = L.rectangle([[-85, -180], [85, 180]], {
   pane: 'satTintPane', stroke: false, fillColor: '#e4e1d6', fillOpacity: 0, interactive: false
@@ -658,7 +667,7 @@ function lerpColor(hex1, hex2, t) {
 function markerStyle(p) {
   const base = IS_MOBILE ? 6 : 4;
   let fillColor = '#1E1E19';
-  if (SECRET_UNLOCKED && p && p.maxDiscountPct > 0) {
+  if (SECRET_UNLOCKED && p && p.hasSale) {
     const t = DISCOUNT_BOUND_MAX > 0 ? Math.min(1, p.maxDiscountPct / DISCOUNT_BOUND_MAX) : 0;
     fillColor = t < 0.5 ? lerpColor('#FFC1C1', '#FF2E2E', t * 2) : lerpColor('#FF2E2E', '#7A0000', (t - 0.5) * 2);
   }
@@ -686,7 +695,8 @@ function wineEntry(w) {
   const isNew = isNewRelease(w);
   const badge = isNew ? '<span class="wine-entry-badge">Nyhet</span>' : '';
   const showSale = SECRET_UNLOCKED && !!w.extrapris;
-  const saleBadge = showSale ? '<span class="wine-entry-sale">\u2013' + Math.abs(w.extrapris.pct) + '%</span>' : '';
+  const salePctText = showSale ? (exactSalePct(w) < 1 ? '&lt;1' : Math.round(exactSalePct(w))) : '';
+  const saleBadge = showSale ? '<span class="wine-entry-sale">\u2013' + salePctText + '%</span>' : '';
   const outBadge = w.slut ? '<span class="wine-entry-out">Tillf\u00e4lligt slut</span>' : '';
   const link = w.varunr && w.namn ? `https://www.systembolaget.se/produkt/vin/${slugify(w.namn)}-${w.varunr}/` : null;
   const meta = [];
@@ -1299,8 +1309,19 @@ function openSecretPrompt() {
   input.value = '';
   setTimeout(() => input.focus(), 50);
 }
+function resetPageScroll() {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  if (typeof map !== 'undefined') map.invalidateSize();
+}
 function closeSecretPrompt() {
+  const input = document.getElementById('secretPromptInput');
+  input.blur();
   document.getElementById('secretPrompt').classList.remove('open');
+  resetPageScroll();
+  setTimeout(resetPageScroll, 150);
+  setTimeout(resetPageScroll, 500);
 }
 document.getElementById('secretPromptInput').addEventListener('input', (e) => {
   if (e.target.value === 'k12') {
