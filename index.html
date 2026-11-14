@@ -744,11 +744,16 @@ function lerpColor(hex1, hex2, t) {
 function markerStyle(p) {
   const base = IS_MOBILE ? 6 : 4;
   let fillColor = '#1E1E19';
-  if (SECRET_UNLOCKED && p && p.hasSale) {
-    const t = DISCOUNT_BOUND_MAX > 0 ? Math.min(1, p.maxDiscountPct / DISCOUNT_BOUND_MAX) : 0;
+  // Ring och färg utgår bara från de viner som syns med valda filter
+  const vis = p ? (p.wines || []).filter(wineMatchesFilters) : [];
+  const visSale = vis.filter(w => w.extrapris);
+  const visNew = vis.some(w => isNewRelease(w));
+  if (SECRET_UNLOCKED && p && visSale.length) {
+    const visMaxPct = Math.max(0, ...visSale.map(w => exactSalePct(w)));
+    const t = DISCOUNT_BOUND_MAX > 0 ? Math.min(1, visMaxPct / DISCOUNT_BOUND_MAX) : 0;
     fillColor = t < 0.5 ? lerpColor('#FFC1C1', '#FF2E2E', t * 2) : lerpColor('#FF2E2E', '#7A0000', (t - 0.5) * 2);
   }
-  if (p && p.has_new) {
+  if (p && visNew) {
     return { radius: base + 2, weight: 2, color: '#FAF9F5', fillColor, fillOpacity: 1 };
   }
   return { radius: base, weight: 0, fillColor, fillOpacity: 1 };
