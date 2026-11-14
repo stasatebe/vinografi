@@ -131,17 +131,30 @@ def hämta_sortiment():
 
     start_ms = int((pd.Timestamp.now(tz='UTC') - pd.Timedelta(days=FÖNSTER_DAGAR)).timestamp() * 1000)
 
-    def pris_före_sänkning(historik, pris):
+    def lansering_ms(datum):
+        """Lanseringsdagens början (svensk tid) i millisekunder, eller None om datum saknas."""
+        if datum is None or pd.isna(datum):
+            return None
+        return int(pd.Timestamp(datum).tz_localize('Europe/Stockholm').timestamp() * 1000)
+
+    def pris_före_sänkning(historik, pris, lansering):
         if not isinstance(historik, list) or not historik:
             return None
         p = sorted((h['x'], h['y']) for h in historik if h.get('x') is not None and h.get('y') is not None)
-        kandidater = [y for x, y in p if x <= start_ms][-1:] + [y for x, y in p if x > start_ms]
+        lans = lansering_ms(lansering)
+        if lans is not None and lans > start_ms:
+            # Lanserat inom fönstret: bara priser från lanseringsdagen och framåt räknas.
+            # Priser från före lanseringen (t.ex. en äldre årgång med samma artikelnummer) ignoreras.
+            kandidater = [y for x, y in p if x >= lans]
+        else:
+            kandidater = [y for x, y in p if x <= start_ms][-1:] + [y for x, y in p if x > start_ms]
         if not kandidater:
             return None
         högst = max(kandidater)
         return högst if högst - pris >= MIN_SÄNKNING_KR else None
 
-    viner['pris_före_sänkning'] = [pris_före_sänkning(h, p) for h, p in zip(viner['priceHistory'], viner['price'])]
+    viner['pris_före_sänkning'] = [pris_före_sänkning(h, p, l) for h, p, l in
+                                   zip(viner['priceHistory'], viner['price'], viner['lanseringsdatum'])]
     viner = viner[KOLUMNER].reset_index(drop=True)
     print(f"Aktuella viner: {len(viner)}, varav tillfälligt slut: {int(viner['tillfälligt_slut'].sum())}, "
           f"sänkt pris: {int(viner['pris_före_sänkning'].notna().sum())}")
