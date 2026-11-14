@@ -671,7 +671,7 @@ function initLabelsOverlay() {
     .then(r => { if (!r.ok) throw new Error('OpenFreeMap svarade ' + r.status); return r.json(); })
     .then(base => {
       const glLayer = make({
-        style: buildLabelStyle(base), pane: 'labelsPane', interactive: false, renderWorldCopies: false,
+        style: buildLabelStyle(base), pane: 'labelsPane', interactive: false, renderWorldCopies: true,
         attributionControl: { customAttribution: '&copy; <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }
       });
       labelsOverlay.clearLayers();
