@@ -1,4 +1,4 @@
-## 🍷 156 nya producenter väntar på att googlas
+## 🍷 2 nya producenter väntar på att googlas
 
 *Listan ändrades senast 2026-11-14. Hemsidan uppdateras automatiskt varje natt.*
 
