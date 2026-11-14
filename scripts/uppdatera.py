@@ -15,6 +15,7 @@ import requests
 # ---------------- Inställningar ----------------
 FÖNSTER_DAGAR = 92       # hur långt bakåt en prissänkning räknas (≈ 3 månader)
 MIN_SÄNKNING_KR = 2      # mindre sänkningar räknas inte
+MIN_DAGAR_PRIS = 14      # ett högre pris räknas bara om det gällt minst så här många dagar
 DATA_URL = "https://susbolaget.emrik.org/v1/products"
 
 ROT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -141,13 +142,27 @@ def hämta_sortiment():
         if not isinstance(historik, list) or not historik:
             return None
         p = sorted((h['x'], h['y']) for h in historik if h.get('x') is not None and h.get('y') is not None)
+        # Slå ihop priser i följd som är lika, och räkna hur länge varje pris gällde
+        perioder = []  # (start_ms, pris, antal dagar priset gällde)
+        nu_ms = int(pd.Timestamp.now(tz='UTC').timestamp() * 1000)
+        for i, (x, y) in enumerate(p):
+            if perioder and perioder[-1][1] == y:
+                continue
+            perioder.append([x, y, 0])
+        for i, per in enumerate(perioder):
+            slut = perioder[i + 1][0] if i + 1 < len(perioder) else nu_ms
+            per[2] = (slut - per[0]) / 86_400_000
+        # Ett högre pris räknas bara om det gällde i minst MIN_DAGAR_PRIS dagar (snabba rättelser och felpriser räknas inte)
+        varaktiga = [(x, y) for x, y, dagar in perioder if dagar >= MIN_DAGAR_PRIS]
         lans = lansering_ms(lansering)
         if lans is not None and lans > start_ms:
             # Lanserat inom fönstret: bara priser från lanseringsdagen och framåt räknas.
             # Priser från före lanseringen (t.ex. en äldre årgång med samma artikelnummer) ignoreras.
-            kandidater = [y for x, y in p if x >= lans]
+            kandidater = [y for x, y in varaktiga if x >= lans]
         else:
-            kandidater = [y for x, y in p if x <= start_ms][-1:] + [y for x, y in p if x > start_ms]
+            # Priset som gällde när fönstret började räknas också om det gällt länge nog
+            före = [(x, y, d) for x, y, d in perioder if x <= start_ms][-1:]
+            kandidater = [y for x, y, d in före if d >= MIN_DAGAR_PRIS] + [y for x, y in varaktiga if x > start_ms]
         if not kandidater:
             return None
         högst = max(kandidater)
