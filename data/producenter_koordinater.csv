@@ -63,7 +63,7 @@ Matias Riccitelli,Argentina,-33.0304773,-68.96036,"bodega Matias Riccitelli MR&M
 Mendel Wines,Argentina,-33.0267165,-68.853255,"Mendel Wines, Juan Florencio Terrada, Distrito Lunlunta, Departamento Maipú, Departamento Luján de Cuyo, Mendoza, M5507, Argentina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Mil Suelos,Argentina,-33.018184,-69.284372,"Camping Mi Refugio, Luján de Cuyo, Mendoza, Argentina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Miravalles S.A.,Argentina,-33.031944,-68.877793,"Sanatorio Regional, Luján de Cuyo, Mendoza, Argentina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
-Montlaiz,Argentina,19.365984,-99.296167,"4, Calle Fernando Carlos Lavalle, Cuajimalpa, Mexico City, Benito Juárez, Ciudad de México, Mexico",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Calle Lavalle 4,5 Kms Norte de AdC Este A, Montecaseros, San Martín, Mendoza, Argentina",2026-09-09 eller tidigare
+Montlaiz,Argentina,-33.03235190719772,-68.43811582610891,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Navarro Correas,Argentina,-32.9254755,-68.8184887,"Bodega Navarro Correas, Distrito San Francisco del Monte, Departamento Guaymallén, Departamento Godoy Cruz, Mendoza, Argentina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Per Se,Argentina,-33.077099,-68.881979,"Perdriel, Luján de Cuyo, Mendoza, Argentina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Piattelli,Argentina,-33.1703413,-68.9199883,"Piattelli​ Wineyard, Juan Francisco Cobos, Colonia 9 De Julio, Agrelo, Distrito Agrelo, Departamento Luján de Cuyo, Mendoza, 5509, Argentina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -214,7 +214,7 @@ Wynns Coonawarra Estate,Australien,-37.2930688,140.8296515,"Wynns Coonawarra Est
 Yalumba,Australien,-34.513291,139.0550954,"Yalumba, 40, Eden Valley Road, Angaston, The Barossa Council, South Australia, 5353, Australia",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"40 Eden Valley Rd, Angaston SA 5353, Australien",2026-11-14
 Yarra Yering Vineyard,Australien,-37.7136648,145.4701306,"Yarra Yering Vineyard, Gruyere, Melbourne, Shire of Yarra Ranges, Victoria, 3770, Australia",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 d'Arenberg,Australien,-35.1970953,138.55164,"D’arenberg Cube, 58, Osborn Road, McLaren Vale, City of Onkaparinga, Adelaide, South Australia, 5171, Australia",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
-Absheron-Sharab,Azerbajdzjan,30.081951,31.263172,"El-Sharabeyah, Cairo, Egypt",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
+Absheron-Sharab,Azerbajdzjan,40.364376456730625,49.83389106216621,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Boerenerf,Belgien,50.7539031,4.2756456,"Het Boerenerf, 3, Sollenberg, Huizingen, Beersel, Halle-Vilvoorde, Flemish Brabant, Flanders, 1654, Belgium",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Sollenberg 3, 1654 Beersel, Belgien",2026-11-14
 Grandes Distilleries de Charleroi,Belgien,50.4418732,4.4768065,"Rue des Verreries, Grande Distillerie de Charleroi, Jumet, Charleroi, Hainaut, Wallonia, 6040, Belgium",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Rue Des Verreries 44/A, 6040 Charleroi, Belgien",2026-09-09 eller tidigare
 Brkic,Bosnien och Hercegovina,43.3442535,17.8117499,"Braće Brkić, Carina, Mostar, City of Mostar, Herzegovina-Neretva Canton, Federation of Bosnia and Herzegovina, 88000, Bosnia and Herzegovina",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -3188,7 +3188,7 @@ Kenbishi Sake Brewery,Japan,36.140658,137.259714,"Sake Brewery, Takayama, Takaya
 Kinmon Akita Sake Brewery Co,Japan,,,,Saknas,"Adress hittad, men gick ej att geokoda","Nishihakkei-34-2 Fujiki, Daisen, Akita 014-1412, Japan",2026-09-09 eller tidigare
 Kitagawa Honke Co. Ltd.,Japan,34.9328048,135.7564704,"おきな屋, 6, Murakamicho, Fushimi Ward, Kyoto, Kyoto Prefecture, 612-8369, Japan",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"370-6 Murakamicho, Fushimi Ward, Kyoto, 612-8369, Japan",2026-09-09 eller tidigare
 Kobe Shu-Shin-Kan Breweries,Japan,34.670444,135.136282,"Kobe-shi, Kobe, Hyogo Prefecture, Japan",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"1-8-17 Mikagezukamachi, Higashinada-ku, Kobe, Hyogo 658-0044, Japan",2026-10-13
-Kokuryu Sake Corporation,Japan,55.200774,-118.795794,"Edo Japan, 13217, 102 St, Grande Prairie, Grande Prairie No. 1, Alberta, T8V 6M6, Canada",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Japan, 〒910-1133 Fukui, Yoshida District, Eiheiji, Matsuokakasuga, 1 Chome−３８",2026-09-09 eller tidigare
+Kokuryu Sake Corporation,Japan,36.09114759938294,136.29906038867114,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Koueigiku Sake Brewery,Japan,36.140658,137.259714,"Sake Brewery, Takayama, Takayama, Gifu Prefecture, Japan",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Masuda Shuzo,Japan,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Matsui Sake Brewery,Japan,35.0254424,135.773523,"松井酒造, 1-6, Higashi Ichijo-dori, Yoshida-Ushinomiyacho, 吉田上大路町, Sakyō Ward, Kyoto, Kyoto Prefecture, 606-8306, Japan",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -3523,7 +3523,7 @@ Taylor's,Portugal,41.1343402,-8.6144032,"Taylor's Port, 250, Rua do Choupelo, De
 Tres Rostos,Portugal,41.313672,-8.188081,"Ribeira de Tresoura, Vila Verde e Santão, Porto, Portugal",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Tubarão,Portugal,,,,Saknas,Sökt - ej hittad,,2026-10-13
 Vadio,Portugal,40.4145549,-8.5698405,"Rua Doutor Manuel Rodrigues, Poutena, Vilarinho do Bairro, Anadia, Aveiro, 3780-601, Portugal",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"R. Dr. Manuel Rodrigues n.º 28A, 3780-594, Portugal",2026-09-09 eller tidigare
-Valados de Melgaço Lda,Portugal,-29.038218,-52.14378,"SN, Estrada De Sao Marcos A Taquara, Putinga, Putinga, Rio Grande Do Sul, 95975-000, Brazil",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Estrada de Sao Marcos, 445 Lugar do Souto - Peso, 4960-256 MLG, Portugal",2026-10-13
+Valados de Melgaço Lda,Portugal,42.105688725872724,-8.292389269881175,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Vallegre Vinhos do Porto,Portugal,41.141943,-8.615418,"Instituto dos Vinhos do Douro e do Porto, 27, Rua Ferreira Borges, S Nicolau, Porto, Porto, Portugal",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Van Zeller Wine Collection SA,Portugal,39.160059,-8.787066,"Vanalia, Cartaxo Municipality, Santarém, Portugal",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Vercoope,Portugal,41.2633656,-8.4786908,"União das Adegas Cooperativas da Região dos Vinhos Verdes, Agrela, Santo Tirso, Porto, Portugal",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -3671,7 +3671,7 @@ Bodega Ecológica Luis Saavedra,Spanien,40.543554,-4.539438,"5, Calle de la Igle
 Bodega Elias Mora,Spanien,41.48131,-5.28454,"San Román de Hornija, Valladolid, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Calle de Don Juan Mora Garzón, 0, 47530 San Román de Hornija, Valladolid, Spanien",2026-09-09 eller tidigare
 Bodega Fulcro,Spanien,42.4344019,-8.8480161,"36990, Noalla, Sanxenxo, O Salnés, Pontevedra, Galicia, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"36990 Sanxenxo, Pontevedra, Spanien",2026-09-09 eller tidigare
 Bodega Lagar de Condesa,Spanien,42.604454,-8.644298,"Caldas de Reis, Pontevedra, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"H9Q7+68, 36655 Caldas de Reis, Pontevedra, Spanien",2026-09-09 eller tidigare
-Bodega Luzdivina Amigo,Spanien,24.889863,-99.473322,"SN, Calle Carretera A Presa Cerro Prieto, Linares, Nuevo León, Mexico",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Ctra. Perandones-Pd, 0, 24516 Parandones, León, Spanien",2026-09-09 eller tidigare
+Bodega Luzdivina Amigo,Spanien,42.571847291906316,-6.772400490554734,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Bodega Madrid Romero,Spanien,37.993988,-1.100862,"Bodega, Ermita de los Remedios, Murcia, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Bodega Malajio S.L,Spanien,36.5524681,-4.6302178,"9, Camino de Campanales, Fuengirola, Malaga, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Cam. de Campanales, 9, 29651 Las Lagunas de Mijas, Málaga, Spanien",2026-09-09 eller tidigare
 Bodega Malvajio Malapipa,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
@@ -3975,7 +3975,7 @@ Cortijo Los Aguilares,Spanien,36.7865547,-5.1001869,"Cortijo Los Aguilares, Cami
 Cosecheros y Criadores,Spanien,37.78481,-3.605987,"Calle Castilla, Mancha Real, Jaen, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Costers del Priorat,Spanien,41.16365,0.76442,"Bellmunt del Priorat, Tarragona, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Costers del Siurana,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
-Coto de Gomariz,Spanien,42.075771,-8.159625,"Marco de fronteira Nº 7, Castro Laboreiro e Lamas de Mouro, Viana do Castelo, Portugal",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Barro de Gomariz, s/n, 32429 Leiro, Ourense, Spanien",2026-09-09 eller tidigare
+Coto de Gomariz,Spanien,42.38121572961202,-8.111618782461408,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Covides Vinyes-Cellers,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Covinas,Spanien,39.491253,-1.111044,"Avenida Rafael Duyos, Requena, La Plana de Utiel-Requena, Valencia, Valencian Community, 46340, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Av. Rafael Duyos, s/n, 46340 Requena, Valencia, Spanien",2026-09-09 eller tidigare
 Cristo de la Vega,Spanien,39.8606003,-4.0333886,"Cristo de la Vega, Avenida de Mas de Rivero, Toledo, Castile-La Mancha, 45004, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -4189,7 +4189,7 @@ Portal del Priorat,Spanien,41.146,0.8177301,"Carrer del Portal del Bou, Falset, 
 Priorat Centenari SL - Bartolome Vernet,Spanien,41.1647496,0.7668997,"carrer Major, Bellmunt del Priorat, Priorat, Tarragona, Catalonia, 43738, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Carrer Major, 23, 43738 Bellmunt del Priorat, Tarragona, Spanien",2026-09-09 eller tidigare
 Priorato de Razamonde,Spanien,,,,Saknas,"Adress hittad, men gick ej att geokoda","Al Lameiro Monte, 64, 32459, Province of Ourense, Spanien",2026-09-09 eller tidigare
 Quinta Milú,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
-Quinta de Couselo,Spanien,41.813514,-8.591719,"13, R Costa Do Padrao, Bárrio e Cepões, Viana do Castelo, 4990-585, Portugal",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Barrio Couselo, 13, 36770 O Rosal, Pontevedra, Spanien",2026-10-13
+Quinta de Couselo,Spanien,41.93480522805458,-8.827866759159031,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 R López de Heredia Viña Tondonia,Spanien,42.5845524,-2.8479174,"R. López de Heredia Viña Tondonia, S.A., 3, Avenida Vizcaya, Barrio de La Estación, Haro, Rioja, 26200, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Av. Vizcaya, 3, 26200 Haro, La Rioja, Spanien",2026-09-09 eller tidigare
 REMELLURI,Spanien,42.5992472,-2.7740102,"Remelluri, LR-316, Rivas de Tereso, Labastida / Bastida, Arabako Errioxa, Álava, Autonomous Community of the Basque Country, 01330, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 RICARD M. DE SIMON SA (RIMARTS),Spanien,41.412875,1.968357,"Ricard Trayter, 52, Avinguda Catalunya, Palma de Cervelló,La, Barcelona, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -4199,7 +4199,7 @@ Raices Ibericas,Spanien,39.476752,-0.375836,"Raices, Ciutat Vella, Valencia, Val
 Rainera Perez Marin,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Rainera Pérez Marín,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Ramirez de la Piscina,Spanien,42.5707831,-2.7599367,"Ramirez de la Piscina, Carretera de la Rioja Alavesa, San Vicente de la Sonsierra, Rioja, 26338, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
-Ramon do Casar,Spanien,-23.019278,-51.459562,"SN, Rodovia Pr Km 43, Prado Ferreira, Prado Ferreira, Parana, 86618-000, Brazil",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"OU-402, Km. 18, 32430 O Prado, Province of Ourense, Spanien",2026-09-09 eller tidigare
+Ramon do Casar,Spanien,42.321657036923234,-8.05457895092907,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Raventós Codorniu,Spanien,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Raventós i Blanc,Spanien,41.4343435,1.794806,"Celler Raventós i Blanc, Sant Sadurní d'Anoia, Alt Penedès, Barcelona, Catalonia, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Real Agrado,Spanien,42.461318,-2.448772,"Realidad, objeto de tiempo, Parque Gallarza, Logrono, La Rioja, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -4280,12 +4280,12 @@ Virgen del Galir,Spanien,42.42187,-6.93712,"Entoma, Ourense, Spain",Manuell goog
 Vitícola Mentridana,Spanien,40.4107,-3.697846,"Vinícola Mentridana, 9, Calle de San Eugenio, Embajadores, Madrid, Madrid, 28012, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Vivanco,Spanien,43.092332,-3.353677,"Vivanco, Valle de Mena, Burgos, Castile and León, 09587, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Viyuela,Spanien,42.359392,-3.6858567,"Lda. María Dolores Viyuela de la Cal, Calle Pozanos, Urbanización Fuente Nueva, Barriada de los Ríos, Distrito Centro Norte, Burgos, Castile and León, 09005, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
-Viña Costeira SCG,Spanien,42.120154,-8.252468,"Capela de Nossa Senhora da Orada, Vila e Roussas, Viana do Castelo, Portugal",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Valdepereira, s/n, 32415 Ribadavia, Province of Ourense, Spanien",2026-09-09 eller tidigare
+Viña Costeira SCG,Spanien,42.306796597702515,-8.118360195240303,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Viña Elena Bodega,Spanien,37.987043,-1.131237,"Palacio Vinader, Murcia, Murcia, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Viña Herminia,Spanien,42.227648,-1.892058,"Aldeanueva de Ebro, La Rioja, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Rioja, la ES, Camino de los Agudos, 1, 26559 Aldeanueva de Ebro, Spanien",2026-09-09 eller tidigare
 Viña Ijalba,Spanien,42.4783514,-2.4428793,"Viña Ijalba, Carretera de Viana, Las Norias, Logroño, Rioja, 26009, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Viña Ilusión,Spanien,42.583844,-2.850303,"Bodegas Bilbaínas. Viña Pomal, Haro, La Rioja, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
-Viña Mein,Spanien,-33.414187,-71.692886,"Lugar de Descanso, El Quisco, San Antonio, De Valparaiso, Chile",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Lugar de Mein, s/n, 32420 Leiro, Province of Ourense, Spanien",2026-09-09 eller tidigare
+Viña Mein,Spanien,42.36179243879789,-8.114760388026877,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Viña Moraima S.Coop.Galega,Spanien,42.5419228,-8.6368242,"Porráns, Barro, Pontevedra, Galicia, 36194, Spain",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"C/ Porrans, 1, 36191 Barro, Pontevedra, Spanien",2026-09-09 eller tidigare
 Viña Olabarri,Spanien,42.5737431,-2.8798704,"Bodegas Viña Olabarri, LR-202, Haro, Rioja, 26230, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Viña Real,Spanien,42.4998938,-2.496732,"Bodega Vina Real, A-124, Laguardia, Arabako Errioxa, Álava, Autonomous Community of the Basque Country, 01308, Spain",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -4358,7 +4358,7 @@ Metod,Sverige,57.6783985,12.0917143,"Metodvägen, Mölnlycke, Härryda kommun, V
 Mjödhamnen,Sverige,59.7689728,14.5201383,"Industrivägen, Hällefors, Hällefors kommun, Örebro County, 712 30, Sweden",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"Industrivägen 7, 712 30 Hällefors",2026-09-09 eller tidigare
 Mjödraskapet,Sverige,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 New Nordic Beverage AB,Sverige,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
-Qvillinge Ekologiska,Sverige,31.580711,-84.17833,"Albany, Dougherty County, Georgia, USA",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"PRÄSTGÅRD, 616 34 Åby",2026-09-09 eller tidigare
+Qvillinge Ekologiska,Sverige,58.64500629542201,16.13391085633721,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 RajRaj Bryggeri,Sverige,56.002345,13.29228,"Röstånga RajRaj, Rostanga, Svalov, Scania, Sweden",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Sahtipaja,Sverige,58.308843,12.397789,"Vastra Gotaland, Sweden",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Saturnus,Sverige,59.3696834,17.9484354,"Saturnus, Duvbo, Sundbybergs kommun, Stockholm County, Sweden",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
@@ -5065,7 +5065,7 @@ LLC Medovyy Spas,Ukraina,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Odesos Winery,Ukraina,46.6168515,30.5912656,"don Alejandro winery, Санаторна вулиця, Kholodna Balka, Нерубайська сільська громада, Odesa Raion, Odesa Oblast, 67660, Ukraine",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 SHABO,Ukraina,46.128258,30.386766,"Shabo, Шабівська сільська громада, Bilhorod-Dnistrovskyi Raion, Odesa Oblast, 67770, Ukraine",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Veles LLC,Ukraina,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
-Vinhol Oksamytnoe LTD,Ukraina,51.381185,12.500319,"1a-1b, Kirchstraße, Taucha, Burgenlandkreis, Saxony-Anhalt, 04425, Germany",Manuell googling + LocationIQ (adress),Adress hittad + geokodad,"1B, st. Nova, Oksamytne, Odesa Oblast, Ukraina, 68740",2026-09-09 eller tidigare
+Vinhol Oksamytnoe LTD,Ukraina,45.631289486394984,28.628172734878895,,Manuell (koordinater),Koordinater angivna manuellt,,2026-11-16
 Attila Pince,Ungern,,,,Saknas,Sökt - ej hittad,,2026-09-09 eller tidigare
 Balassa Bor,Ungern,48.1267704,21.4081958,"Balassa Bor Vendégház, 11, Bethlen Gábor utca, Óváros, Tokaj, Tokaji járás, Borsod-Abaúj-Zemplén, North Hungary, Great Plain and North, 3910, Hungary",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
 Balatonboglár Winery,Ungern,46.775781,17.660178,"Balatonboglár, Somogy, Hungary",Ursprunglig LocationIQ (producentnamn),,,2026-09-09 eller tidigare
