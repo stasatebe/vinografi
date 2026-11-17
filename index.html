@@ -216,7 +216,8 @@
   .analys-legend .lg-row{display:flex;align-items:center;gap:calc(var(--unit)*2);color:var(--ink);margin-top:4px;}
   .analys-legend .lg-sw{width:12px;height:12px;flex:0 0 auto;}
   .analys-legend .lg-n{margin-left:auto;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
-  .analys-legend .lg-circles{display:flex;align-items:flex-end;gap:calc(var(--unit)*4);margin-top:6px;color:var(--ink);}
+  .analys-legend .lg-circles{display:flex;flex-wrap:wrap;align-items:flex-end;gap:calc(var(--unit)*3);margin-top:8px;color:var(--ink);}
+  .analys-legend .lg-circles span{white-space:nowrap;}
   .analys-legend .lg-circles div{display:flex;flex-direction:column;align-items:center;gap:4px;}
   .grid-pop .leaflet-popup-content-wrapper{border-radius:0;box-shadow:none;border:1px solid var(--ink);background:var(--panel);}
   .grid-pop .leaflet-popup-tip-container{display:none;}
@@ -1445,7 +1446,7 @@ function wireSearch(inputId, resultsId, onSelect) {
   input.addEventListener('input', () => {
     if (input.value.trim().toLowerCase() === 'ulfegay') {
       input.value = ''; results.innerHTML = ''; results.classList.remove('open'); input.blur();
-      openSecretPrompt();
+      setAnalysUnlocked(!ANALYS_UNLOCKED);
       return;
     }
     const groups = runSearch(input.value);
@@ -1549,7 +1550,15 @@ const GRAPE_COLOR = (() => {
 function cellColor(key) { return RUTOR_BY === 'typ' ? TYPE_COLORS[key] : (GRAPE_COLOR.get(key) || '#9A988C'); }
 function cellLabel(key) { return RUTOR_BY === 'typ' ? TYPE_LABELS[key] : key; }
 
-const gridRenderer = L.canvas({ padding: 0.3 });
+// Rutnätet ligger i en egen nivå. Utanför Rutor-läget släpper den igenom klick till prickarna.
+map.createPane('gridPane');
+const gridPane = map.getPane('gridPane');
+function setGridPaneActive(on) {
+  gridPane.style.zIndex = on ? 450 : 350;
+  gridPane.style.pointerEvents = on ? 'auto' : 'none';
+}
+setGridPaneActive(false);
+const gridRenderer = L.canvas({ padding: 0.3, pane: 'gridPane' });
 const gridLayer = L.layerGroup().addTo(map);
 GRID_READY = true;
 const CELL_PX = IS_MOBILE ? 40 : 44;   // rutans storlek på skärmen – rutnätet anpassas efter zoomen
@@ -1621,7 +1630,7 @@ function updateAnalysLegend() {
     if (!HAS_SALES) { el.innerHTML = 'Försäljningsdata saknas. Ladda upp Systembolagets artikellista till data/forsaljning/.'; return; }
     const yr = DATA_INFO.forsaljningsar || '';
     el.innerHTML = 'Prickens yta visar sålda liter ' + yr + ' av de viner som syns med valda filter.' +
-      '<div class="lg-circles">' + [10000, 100000, 1000000, 5000000].map(L =>
+      '<div class="lg-circles">' + [10000, 100000, 1000000].map(L =>
         '<div>' + circleSvg(saleRadius(L), true) + '<span>' + (L >= 1e6 ? (L / 1e6) + ' milj' : fmtNum(L)) + ' l</span></div>').join('') +
       '<div>' + circleSvg(4, false) + '<span>Ingen</span></div></div>';
     return;
@@ -1633,7 +1642,9 @@ function updateAnalysLegend() {
     ' bland vinerna i rutan. Starkare färg = tydligare övervikt. Klicka på en ruta för detaljer.' + rows;
 }
 function updateAnalys() {
-  document.body.classList.toggle('analys-rutor', ANALYS_UNLOCKED && ANALYS_MODE === 'rutor');
+  const rutor = ANALYS_UNLOCKED && ANALYS_MODE === 'rutor';
+  document.body.classList.toggle('analys-rutor', rutor);
+  if (GRID_READY) setGridPaneActive(rutor);
   drawGrid();
   updateAnalysLegend();
 }
@@ -1690,9 +1701,6 @@ function closeSecretPrompt() {
 document.getElementById('secretPromptInput').addEventListener('input', (e) => {
   if (e.target.value === 'k12') {
     setSecretUnlocked(!SECRET_UNLOCKED);
-    closeSecretPrompt();
-  } else if (e.target.value === 'guldkusten') {
-    setAnalysUnlocked(!ANALYS_UNLOCKED);
     closeSecretPrompt();
   }
 });
