@@ -205,6 +205,25 @@
   .wine-entry-grapes{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;}
   .wine-entry-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
   .wine-entry-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--blue);border:1px solid var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
+  .analys-section{display:none;}
+  body.analys-unlocked .analys-section{display:block;}
+  .analys-pill{color:var(--ink-soft);cursor:pointer;padding:0 0 2px;background:none;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:11.5px;white-space:nowrap;flex:0 0 auto;}
+  .analys-pill.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink);}
+  .analys-sub{display:none;}
+  body.analys-rutor .analys-sub{display:flex;}
+  .analys-legend{padding:calc(var(--unit)*3) calc(var(--unit)*4);border-top:1px solid var(--line);color:var(--ink-soft);font-size:11.5px;line-height:1.5;}
+  .analys-legend:empty{display:none;}
+  .analys-legend .lg-row{display:flex;align-items:center;gap:calc(var(--unit)*2);color:var(--ink);margin-top:4px;}
+  .analys-legend .lg-sw{width:12px;height:12px;flex:0 0 auto;}
+  .analys-legend .lg-n{margin-left:auto;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+  .analys-legend .lg-circles{display:flex;align-items:flex-end;gap:calc(var(--unit)*4);margin-top:6px;color:var(--ink);}
+  .analys-legend .lg-circles div{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .grid-pop .leaflet-popup-content-wrapper{border-radius:0;box-shadow:none;border:1px solid var(--ink);background:var(--panel);}
+  .grid-pop .leaflet-popup-tip-container{display:none;}
+  .grid-pop .leaflet-popup-content{margin:10px 12px;font-family:inherit;font-size:12px;line-height:1.5;color:var(--ink);min-width:150px;}
+  .grid-pop .gp-head{color:var(--ink-soft);margin-bottom:4px;}
+  .grid-pop .gp-row{display:flex;align-items:center;gap:8px;}
+  .grid-pop .gp-row span:last-child{margin-left:auto;font-variant-numeric:tabular-nums;}
   .wine-entry-reduced{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:#C1121F;border:1px solid #C1121F;padding:1px 5px;margin-left:calc(var(--unit)*1);}
   .wine-entry-sale{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--panel);background:var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
 .wine-entry-out{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);border:1px solid var(--ink-soft);padding:1px 5px;margin-left:calc(var(--unit)*1);}
@@ -417,6 +436,19 @@
             </div>
           </div>
         </div>
+        <div class="section analys-section" id="analysSection">
+          <div class="section-label"><span class="sl-text">Analys</span></div>
+          <div class="layer-row" id="analysModeRow">
+            <button class="analys-pill active" data-mode="producenter">Producenter</button>
+            <button class="analys-pill" data-mode="forsaljning">Försäljning</button>
+            <button class="analys-pill" data-mode="rutor">Rutor</button>
+          </div>
+          <div class="layer-row analys-sub" id="analysByRow">
+            <button class="analys-pill active" data-by="typ">Vintyp</button>
+            <button class="analys-pill" data-by="druva">Druva</button>
+          </div>
+          <div class="analys-legend" id="analysLegend"></div>
+        </div>
       </div>
     </aside>
     </div>
@@ -581,6 +613,9 @@ let VINT_MIN = VINTAGE_MIN, VINT_MAX = VINTAGE_MAX;
 let INCLUDE_NO_VINTAGE = true;
 let DISCOUNT_MIN = 0, DISCOUNT_MAX = DISCOUNT_BOUND_MAX;
 let CURRENT_FILTERED = [];
+let ANALYS_UNLOCKED = false, ANALYS_MODE = 'producenter', RUTOR_BY = 'typ';
+let LITERS_CACHE = new Map();
+let GRID_DOMINANT = [], GRID_READY = false;
 let markerByName = new Map();
 
 // ---------------- MAP SETUP ----------------
@@ -761,6 +796,12 @@ function markerStyle(p) {
     const t = DISCOUNT_BOUND_MAX > 0 ? Math.min(1, visMaxPct / DISCOUNT_BOUND_MAX) : 0;
     fillColor = t < 0.5 ? lerpColor('#FFC1C1', '#FF2E2E', t * 2) : lerpColor('#FF2E2E', '#7A0000', (t - 0.5) * 2);
   }
+  // Analys: Försäljning – prickens yta efter sålda liter. Tom ring = ingen försäljning (t.ex. nytt vin).
+  if (ANALYS_UNLOCKED && ANALYS_MODE === 'forsaljning' && p) {
+    const L = producerLiters(p);
+    if (L > 0) return { radius: saleRadius(L), weight: 1, color: '#FAF9F5', opacity: 0.9, fillColor, fillOpacity: 0.6 };
+    return { radius: base + 1, weight: 1.5, color: '#FAF9F5', opacity: 0.9, fillColor, fillOpacity: 0 };
+  }
   // Nysänkt (bara när rean är upplåst): mjuk röd glöd. Vinner över nyhetsringen.
   if (SECRET_UNLOCKED && visSale.some(isRecentlyReduced)) {
     return { radius: base + 2, weight: 7, color: '#FF2E2E', opacity: 0.45, fillColor, fillOpacity: 1 };
@@ -770,8 +811,11 @@ function markerStyle(p) {
   }
   return { radius: base, weight: 0, opacity: 1, fillColor, fillOpacity: 1 };
 }
-function selectedMarkerStyle() {
-  return { radius: IS_MOBILE ? 9 : 7, weight: 0, fillColor: '#B5476B', fillOpacity: 1 };
+function selectedMarkerStyle(p) {
+  if (ANALYS_UNLOCKED && ANALYS_MODE === 'forsaljning' && p) {
+    return Object.assign(markerStyle(p), { fillColor: '#B5476B', fillOpacity: 0.85, color: '#B5476B' });
+  }
+  return { radius: IS_MOBILE ? 9 : 7, weight: 0, opacity: 1, fillColor: '#B5476B', fillOpacity: 1 };
 }
 function deselectMarker() {
   if (selectedMarker && selectedProducer) selectedMarker.setStyle(markerStyle(selectedProducer));
@@ -801,6 +845,7 @@ function wineEntry(w) {
   if (showSale) { meta.push(w.extrapris.old + '\u2192' + w.extrapris.new + ' kr'); }
   else if (w.pris) { meta.push(w.pris + ' kr'); }
   if (w.sortiment) meta.push(w.sortiment);
+  if (ANALYS_UNLOCKED && w.liter != null) meta.push(fmtNum(w.liter) + ' l s\u00e5lt ' + (DATA_INFO.forsaljningsar || ''));
   const SHOW_PRODUCT_IMAGES = false; // see chat: Systembolaget's API terms reserve product images as their IP
   const thumb = (SHOW_PRODUCT_IMAGES && w.image)
     ? '<img class="wine-thumb" src="' + escapeHtml(w.image) + '_400.png" loading="lazy" alt="" onerror="this.style.display=\'none\'">'
@@ -879,7 +924,7 @@ document.getElementById('lagerClose').addEventListener('click', () => { if (mobi
 function selectProducer(p, marker) {
   deselectMarker();
   selectedMarker = marker; selectedProducer = p;
-  marker.setStyle(selectedMarkerStyle());
+  marker.setStyle(selectedMarkerStyle(p));
   marker.bringToFront();
   document.getElementById('wineCardBody').innerHTML = producerHtml(p);
   document.getElementById('aboutCard').classList.remove('open');
@@ -1226,10 +1271,15 @@ function render() {
   markerByName = new Map();
 
   CURRENT_FILTERED = PRODUCERS.filter(producerMatchesFilters);
+  LITERS_CACHE = new Map();
 
-  CURRENT_FILTERED.forEach(p => {
+  // Försäljning: stora först så att små hamnar ovanpå. Rutor: inga prickar.
+  let list = CURRENT_FILTERED;
+  if (ANALYS_UNLOCKED && ANALYS_MODE === 'forsaljning') list = [...list].sort((a, b) => producerLiters(b) - producerLiters(a));
+  const showDots = !(ANALYS_UNLOCKED && ANALYS_MODE === 'rutor');
+  list.forEach(p => {
     const m = makeMarker(p);
-    plainLayerGroup.addLayer(m);
+    if (showDots) plainLayerGroup.addLayer(m);
     markerByName.set(p, m);
   });
 
@@ -1238,6 +1288,7 @@ function render() {
     '<b>' + fmtNum(CURRENT_FILTERED.length) + '</b> producenter \u00b7 <b>' + fmtNum(wineTotal) + '</b> viner';
 
   updateExploreCaption();
+  updateAnalys();
 }
 
 // ---------------- SIDEBAR OPEN/CLOSE ----------------
@@ -1392,6 +1443,11 @@ function wireSearch(inputId, resultsId, onSelect) {
     results.appendChild(row);
   }
   input.addEventListener('input', () => {
+    if (input.value.trim().toLowerCase() === 'ulfegay') {
+      input.value = ''; results.innerHTML = ''; results.classList.remove('open'); input.blur();
+      openSecretPrompt();
+      return;
+    }
     const groups = runSearch(input.value);
     results.innerHTML = '';
     if (input.value.trim().length >= 2) {
@@ -1455,6 +1511,156 @@ function setSecretUnlocked(unlocked) {
   render();
 }
 
+// ---------------- ANALYS (låses upp med sökordet + lösenord) ----------------
+function producerLiters(p) {
+  if (LITERS_CACHE.has(p)) return LITERS_CACHE.get(p);
+  const L = (p.wines || []).filter(wineMatchesFilters).reduce((s, w) => s + (w.liter || 0), 0);
+  LITERS_CACHE.set(p, L);
+  return L;
+}
+// Ytan är proportionell mot liter (roten ur). Största producenterna (miljontals liter) blir ca 60 px.
+function saleRadius(L) { return Math.min(62, 2.5 + Math.sqrt(L) * 0.02); }
+const HAS_SALES = PRODUCERS.some(p => (p.wines || []).some(w => w.liter != null));
+
+const TYPE_COLORS = { 'Rött vin': '#6E1423', 'Vitt vin': '#E6D27C', 'Rosévin': '#F09A7A', 'Mousserande vin': '#F3EDC0', 'Övrigt': '#9A988C' };
+const TYPE_LABELS = { 'Rött vin': 'Rött', 'Vitt vin': 'Vitt', 'Rosévin': 'Rosé', 'Mousserande vin': 'Mousserande', 'Övrigt': 'Övrigt' };
+function typeKey(k) { return TYPE_COLORS[k] && k !== 'Övrigt' ? k : 'Övrigt'; }
+function splitGrapes(s) { return s ? String(s).split(/,\s*/).map(x => x.trim()).filter(Boolean) : []; }
+
+// Druvfärger: röda druvor i röda nyanser, gröna druvor i gulgröna. Röd/grön avgörs av i vilka viner druvan oftast finns.
+const GRAPE_COLOR = (() => {
+  const st = new Map();
+  PRODUCERS.forEach(p => (p.wines || []).forEach(w => splitGrapes(w.druvor).forEach(g => {
+    const o = st.get(g) || { n: 0, red: 0, white: 0 };
+    o.n++; if (w.kategori === 'Rött vin') o.red++; else if (w.kategori === 'Vitt vin') o.white++;
+    st.set(g, o);
+  })));
+  const reds = ['#6E1423', '#B0172A', '#E04B4B', '#7E2E5C', '#C2603F', '#43101B', '#D88093', '#9A3D2E', '#5C2A3F', '#F08E7A'];
+  const greens = ['#E6D27C', '#A9BA3B', '#6E8E2A', '#D4A62A', '#C9DB8A', '#8FAE6B', '#4F6B22', '#EFE3A4', '#B8962E', '#DCE2B0'];
+  const sorted = [...st.entries()].sort((a, b) => b[1].n - a[1].n);
+  const out = new Map(); let ri = 0, gi = 0;
+  sorted.forEach(([g, o]) => {
+    const isRed = o.red >= o.white;
+    if (isRed) out.set(g, ri < reds.length ? reds[ri++] : '#B07A80');
+    else out.set(g, gi < greens.length ? greens[gi++] : '#C8C49A');
+  });
+  return out;
+})();
+function cellColor(key) { return RUTOR_BY === 'typ' ? TYPE_COLORS[key] : (GRAPE_COLOR.get(key) || '#9A988C'); }
+function cellLabel(key) { return RUTOR_BY === 'typ' ? TYPE_LABELS[key] : key; }
+
+const gridRenderer = L.canvas({ padding: 0.3 });
+const gridLayer = L.layerGroup().addTo(map);
+GRID_READY = true;
+const CELL_PX = IS_MOBILE ? 40 : 44;   // rutans storlek på skärmen – rutnätet anpassas efter zoomen
+function drawGrid() {
+  if (!GRID_READY) return;   // anropas tidigt vid start, innan rutnätet finns
+  gridLayer.clearLayers();
+  GRID_DOMINANT = [];
+  if (!(ANALYS_UNLOCKED && ANALYS_MODE === 'rutor')) return;
+  const z = map.getZoom();
+  const bounds = map.getBounds().pad(0.3);
+  const cells = new Map();
+  CURRENT_FILTERED.forEach(p => {
+    if (!bounds.contains([p.lat, p.lon])) return;
+    const pt = map.project([p.lat, p.lon], z);
+    const cx = Math.floor(pt.x / CELL_PX), cy = Math.floor(pt.y / CELL_PX), k = cx + ':' + cy;
+    let c = cells.get(k);
+    if (!c) { c = { cx, cy, n: 0, counts: new Map() }; cells.set(k, c); }
+    (p.wines || []).filter(wineMatchesFilters).forEach(w => {
+      const keys = RUTOR_BY === 'typ' ? [typeKey(w.kategori)] : splitGrapes(w.druvor);
+      if (!keys.length) return;
+      c.n++;
+      keys.forEach(kk => c.counts.set(kk, (c.counts.get(kk) || 0) + 1));
+    });
+  });
+  const domCount = new Map();
+  cells.forEach(c => {
+    if (!c.n) return;
+    const top = [...c.counts.entries()].sort((a, b) => b[1] - a[1]);
+    const [key, cnt] = top[0];
+    const share = cnt / c.n;
+    domCount.set(key, (domCount.get(key) || 0) + 1);
+    const sw = map.unproject([c.cx * CELL_PX, c.cy * CELL_PX], z);
+    const ne = map.unproject([(c.cx + 1) * CELL_PX, (c.cy + 1) * CELL_PX], z);
+    const rect = L.rectangle([sw, ne], {
+      renderer: gridRenderer, color: '#FAF9F5', weight: 0.5, opacity: 0.5,
+      fillColor: cellColor(key), fillOpacity: Math.min(0.85, 0.25 + 0.6 * share)
+    });
+    rect.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      const rows = top.slice(0, 5).map(([k2, n2]) =>
+        '<div class="gp-row"><i style="width:9px;height:9px;background:' + cellColor(k2) + ';display:inline-block"></i><span>' +
+        escapeHtml(cellLabel(k2)) + '</span><span>' + Math.round(n2 / c.n * 100) + ' %</span></div>').join('');
+      L.popup({ className: 'grid-pop', closeButton: false, autoPan: false })
+        .setLatLng(e.latlng)
+        .setContent('<div class="gp-head">' + fmtNum(c.n) + (c.n === 1 ? ' vin' : ' viner') + ' i rutan</div>' + rows)
+        .openOn(map);
+    });
+    gridLayer.addLayer(rect);
+  });
+  GRID_DOMINANT = [...domCount.entries()].sort((a, b) => b[1] - a[1]);
+}
+let gridQueued = false;
+map.on('moveend zoomend', () => {
+  if (!(ANALYS_UNLOCKED && ANALYS_MODE === 'rutor') || gridQueued) return;
+  gridQueued = true;
+  requestAnimationFrame(() => { gridQueued = false; drawGrid(); updateAnalysLegend(); });
+});
+
+function circleSvg(r, filled) {
+  const d = Math.ceil(r * 2 + 2);
+  return '<svg width="' + d + '" height="' + d + '"><circle cx="' + d / 2 + '" cy="' + d / 2 + '" r="' + r + '" fill="' +
+    (filled ? '#1E1E19' : 'none') + '" fill-opacity="0.6" stroke="#1E1E19" stroke-width="1"/></svg>';
+}
+function updateAnalysLegend() {
+  const el = document.getElementById('analysLegend');
+  if (!el) return;
+  if (!ANALYS_UNLOCKED || ANALYS_MODE === 'producenter') { el.innerHTML = ''; return; }
+  if (ANALYS_MODE === 'forsaljning') {
+    if (!HAS_SALES) { el.innerHTML = 'Försäljningsdata saknas. Ladda upp Systembolagets artikellista till data/forsaljning/.'; return; }
+    const yr = DATA_INFO.forsaljningsar || '';
+    el.innerHTML = 'Prickens yta visar sålda liter ' + yr + ' av de viner som syns med valda filter.' +
+      '<div class="lg-circles">' + [10000, 100000, 1000000, 5000000].map(L =>
+        '<div>' + circleSvg(saleRadius(L), true) + '<span>' + (L >= 1e6 ? (L / 1e6) + ' milj' : fmtNum(L)) + ' l</span></div>').join('') +
+      '<div>' + circleSvg(4, false) + '<span>Ingen</span></div></div>';
+    return;
+  }
+  const rows = GRID_DOMINANT.slice(0, 12).map(([k, n]) =>
+    '<div class="lg-row"><span class="lg-sw" style="background:' + cellColor(k) + '"></span><span>' + escapeHtml(cellLabel(k)) +
+    '</span><span class="lg-n">' + n + (n === 1 ? ' ruta' : ' rutor') + '</span></div>').join('');
+  el.innerHTML = 'Rutans färg visar ' + (RUTOR_BY === 'typ' ? 'vanligaste vintyp' : 'vanligaste druva') +
+    ' bland vinerna i rutan. Starkare färg = tydligare övervikt. Klicka på en ruta för detaljer.' + rows;
+}
+function updateAnalys() {
+  document.body.classList.toggle('analys-rutor', ANALYS_UNLOCKED && ANALYS_MODE === 'rutor');
+  drawGrid();
+  updateAnalysLegend();
+}
+function setAnalysMode(mode) {
+  ANALYS_MODE = mode;
+  document.querySelectorAll('#analysModeRow .analys-pill').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  map.closePopup();
+  deselectMarker();
+  render();
+}
+document.querySelectorAll('#analysModeRow .analys-pill').forEach(b => b.addEventListener('click', () => setAnalysMode(b.dataset.mode)));
+document.querySelectorAll('#analysByRow .analys-pill').forEach(b => b.addEventListener('click', () => {
+  RUTOR_BY = b.dataset.by;
+  document.querySelectorAll('#analysByRow .analys-pill').forEach(x => x.classList.toggle('active', x === b));
+  map.closePopup();
+  updateAnalys();
+}));
+function setAnalysUnlocked(unlocked) {
+  ANALYS_UNLOCKED = unlocked;
+  document.body.classList.toggle('analys-unlocked', unlocked);
+  if (!unlocked) { ANALYS_MODE = 'producenter'; }
+  document.querySelectorAll('#analysModeRow .analys-pill').forEach(b => b.classList.toggle('active', b.dataset.mode === ANALYS_MODE));
+  map.closePopup();
+  deselectMarker();
+  render();
+}
+
 const secretMarker = L.circleMarker([59.70603609708796, 14.543204397251872], Object.assign({ renderer: markerRenderer }, markerStyle(null)));
 secretMarker.addTo(map);
 secretMarker.on('click', (e) => {
@@ -1484,6 +1690,9 @@ function closeSecretPrompt() {
 document.getElementById('secretPromptInput').addEventListener('input', (e) => {
   if (e.target.value === 'k12') {
     setSecretUnlocked(!SECRET_UNLOCKED);
+    closeSecretPrompt();
+  } else if (e.target.value === 'guldkusten') {
+    setAnalysUnlocked(!ANALYS_UNLOCKED);
     closeSecretPrompt();
   }
 });
