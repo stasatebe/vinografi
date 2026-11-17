@@ -13,7 +13,7 @@ import pandas as pd
 import requests
 
 # ---------------- Inställningar ----------------
-FÖNSTER_DAGAR = 92       # hur långt bakåt en prissänkning räknas (≈ 3 månader)
+FÖNSTER_DAGAR = 180      # hur långt bakåt en prissänkning räknas (≈ 6 månader)
 MIN_SÄNKNING_KR = 2      # mindre sänkningar räknas inte
 MIN_DAGAR_PRIS = 14      # ett högre pris räknas bara om det gällt minst så här många dagar
 DATA_URL = "https://susbolaget.emrik.org/v1/products"
@@ -33,7 +33,7 @@ KOLUMNER = ['productId', 'productNumber', 'productNameBold', 'productNameThin',
             'producerName', 'supplierName', 'country', 'originLevel1', 'originLevel2',
             'categoryLevel2', 'categoryLevel3', 'price', 'volume', 'alcoholPercentage', 'vintage',
             'grapes', 'taste', 'tasteSymbols', 'assortmentText', 'lanseringsdatum', 'bildlänk',
-            'pris_före_sänkning', 'tillfälligt_slut']
+            'pris_före_sänkning', 'sänkt_datum', 'tillfälligt_slut']
 
 
 def nyckel(namn):
@@ -164,12 +164,20 @@ def hämta_sortiment():
             före = [(x, y, d) for x, y, d in perioder if x <= start_ms][-1:]
             kandidater = [y for x, y, d in före if d >= MIN_DAGAR_PRIS] + [y for x, y in varaktiga if x > start_ms]
         if not kandidater:
-            return None
+            return None, None
         högst = max(kandidater)
-        return högst if högst - pris >= MIN_SÄNKNING_KR else None
+        if högst - pris < MIN_SÄNKNING_KR:
+            return None, None
+        # Datum för den senaste sänkningen = när nuvarande pris började gälla
+        sänkt = None
+        if perioder and perioder[-1][1] == pris:
+            sänkt = pd.Timestamp(perioder[-1][0], unit='ms', tz='UTC').tz_convert('Europe/Stockholm').date().isoformat()
+        return högst, sänkt
 
-    viner['pris_före_sänkning'] = [pris_före_sänkning(h, p, l) for h, p, l in
-                                   zip(viner['priceHistory'], viner['price'], viner['lanseringsdatum'])]
+    res = [pris_före_sänkning(h, p, l) for h, p, l in
+           zip(viner['priceHistory'], viner['price'], viner['lanseringsdatum'])]
+    viner['pris_före_sänkning'] = [r[0] for r in res]
+    viner['sänkt_datum'] = [r[1] for r in res]
     viner = viner[KOLUMNER].reset_index(drop=True)
     print(f"Aktuella viner: {len(viner)}, varav tillfälligt slut: {int(viner['tillfälligt_slut'].sum())}, "
           f"sänkt pris: {int(viner['pris_före_sänkning'].notna().sum())}")
@@ -275,6 +283,8 @@ def bygg_data_js(master):
             if not tom(gammalt) and pris < gammalt:
                 gm = int(gammalt) if float(gammalt).is_integer() else float(gammalt)
                 vin['extrapris'] = {'old': gm, 'new': pris, 'pct': math.floor((pris - gm) / gm * 100 + 0.5)}
+                if not tom(w['sänkt_datum']):
+                    vin['extrapris']['sedan'] = w['sänkt_datum']
             if w['tillfälligt_slut'] == True:
                 vin['slut'] = True
             vinlista.append(vin)
