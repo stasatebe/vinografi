@@ -111,7 +111,7 @@
   .dual-range{position:relative;height:32px;cursor:pointer;touch-action:pan-y;}
   .dr-track{position:absolute;left:0;right:0;height:1px;background:var(--line-strong);top:50%;}
   .dr-fill{position:absolute;height:2px;background:var(--blue);top:50%;margin-top:-0.5px;}
-  #rabattFill{height:3px;}
+  #rabattFill{height:3px;background:linear-gradient(to right, #FFC1C1, #FF2E2E, #7A0000);}
   #rabattMin::-webkit-slider-thumb, #rabattMax::-webkit-slider-thumb{background:#7A0000;box-shadow:0 0 0 1px #7A0000;}
   #rabattMin::-moz-range-thumb, #rabattMax::-moz-range-thumb{background:#7A0000;box-shadow:0 0 0 1px #7A0000;}
   .dr-input{position:absolute;left:0;right:0;width:100%;top:6px;margin:0;height:20px;-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;}
@@ -205,6 +205,7 @@
   .wine-entry-grapes{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;}
   .wine-entry-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
   .wine-entry-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--blue);border:1px solid var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
+  .wine-entry-reduced{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:#C1121F;border:1px solid #C1121F;padding:1px 5px;margin-left:calc(var(--unit)*1);}
   .wine-entry-sale{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--panel);background:var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
 .wine-entry-out{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);border:1px solid var(--ink-soft);padding:1px 5px;margin-left:calc(var(--unit)*1);}
 .wine-entry.is-out .wine-entry-body{opacity:0.6;}
@@ -527,6 +528,13 @@ PRODUCERS.forEach(p => (p.wines || []).forEach(w => {
 }));
 const NEW_RELEASE_YEAR = latestReleaseDate.getFullYear();
 const NEW_RELEASE_MONTH = latestReleaseDate.getMonth(); // nyheter = månaden för den senaste lanseringen i datan
+const NYSANKT_DAGAR = 30;
+const DATA_DAG = new Date((typeof DATA_INFO !== 'undefined' && (DATA_INFO.uttag || DATA_INFO.skapad)) || Date.now());
+function isRecentlyReduced(w) {
+  if (!w.extrapris || !w.extrapris.sedan) return false;
+  const d = new Date(w.extrapris.sedan);
+  return (DATA_DAG - d) / 86400000 <= NYSANKT_DAGAR;
+}
 function isNewRelease(w) {
   if (!w.lanserad) return false;
   const d = new Date(w.lanserad);
@@ -753,10 +761,14 @@ function markerStyle(p) {
     const t = DISCOUNT_BOUND_MAX > 0 ? Math.min(1, visMaxPct / DISCOUNT_BOUND_MAX) : 0;
     fillColor = t < 0.5 ? lerpColor('#FFC1C1', '#FF2E2E', t * 2) : lerpColor('#FF2E2E', '#7A0000', (t - 0.5) * 2);
   }
-  if (p && visNew) {
-    return { radius: base + 2, weight: 2, color: '#FAF9F5', fillColor, fillOpacity: 1 };
+  // Nysänkt (bara när rean är upplåst): mjuk röd glöd. Vinner över nyhetsringen.
+  if (SECRET_UNLOCKED && visSale.some(isRecentlyReduced)) {
+    return { radius: base + 2, weight: 7, color: '#FF2E2E', opacity: 0.45, fillColor, fillOpacity: 1 };
   }
-  return { radius: base, weight: 0, fillColor, fillOpacity: 1 };
+  if (p && visNew) {
+    return { radius: base + 2, weight: 2, color: '#FAF9F5', opacity: 1, fillColor, fillOpacity: 1 };
+  }
+  return { radius: base, weight: 0, opacity: 1, fillColor, fillOpacity: 1 };
 }
 function selectedMarkerStyle() {
   return { radius: IS_MOBILE ? 9 : 7, weight: 0, fillColor: '#B5476B', fillOpacity: 1 };
@@ -781,6 +793,7 @@ function wineEntry(w) {
   const showSale = SECRET_UNLOCKED && !!w.extrapris;
   const salePctText = showSale ? (exactSalePct(w) < 1 ? '&lt;1' : Math.round(exactSalePct(w))) : '';
   const saleBadge = showSale ? '<span class="wine-entry-sale">\u2013' + salePctText + '%</span>' : '';
+  const reducedBadge = showSale && isRecentlyReduced(w) ? '<span class="wine-entry-reduced">Nys\u00e4nkt</span>' : '';
   const outBadge = w.slut ? '<span class="wine-entry-out">Tillf\u00e4lligt slut</span>' : '';
   const link = w.varunr && w.namn ? `https://www.systembolaget.se/produkt/vin/${slugify(w.namn)}-${w.varunr}/` : null;
   const meta = [];
@@ -797,7 +810,7 @@ function wineEntry(w) {
   let html = '<' + tag + ' class="wine-entry' + (showSale ? ' has-sale' : '') + (w.slut ? ' is-out' : '') + '"' + linkAttrs + '>';
   html += thumb;
   html += '<div class="wine-entry-body">';
-  html += '<div class="wine-entry-top"><span class="wine-entry-title">' + escapeHtml(w.namn) + badge + saleBadge + outBadge + '</span>' + (link ? '<span class="wine-entry-arrow">' + ARROW_SVG + '</span>' : '') + '</div>';
+  html += '<div class="wine-entry-top"><span class="wine-entry-title">' + escapeHtml(w.namn) + badge + reducedBadge + saleBadge + outBadge + '</span>' + (link ? '<span class="wine-entry-arrow">' + ARROW_SVG + '</span>' : '') + '</div>';
   if (w.namn2) html += '<div class="wine-entry-sub">' + escapeHtml(w.namn2) + '</div>';
   if (w.druvor) html += '<div class="wine-entry-grapes">' + escapeHtml(w.druvor) + '</div>';
   html += '<div class="wine-entry-meta">' + escapeHtml(meta.join(' \u00b7 ')) + '</div>';
@@ -971,7 +984,7 @@ function buildFacet(containerId, counts, activeSet, opts) {
   opts = opts || {};
   const el = document.getElementById(containerId);
   el.innerHTML = '';
-  const byCount = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const byCount = Object.entries(counts).sort(opts.alpha ? ((a, b) => a[0].localeCompare(b[0], 'sv')) : ((a, b) => b[1] - a[1]));
   let allEntries = byCount;
   // Valda alternativ läggs överst när listan byggs eller öppnas (inte medan man klickar, så att inget hoppar).
   function sortSelectedFirst() {
@@ -1065,7 +1078,7 @@ function updateFacetSummaries() {
 function rebuildFacets() {
   buildFacet('typeChecks', countBy(w => w.kategori), ACTIVE_TYPES);
   buildFacet('grapeChecks', countByGrape(), ACTIVE_GRAPES, { truncate: 8, noun: 'druvor', searchable: true });
-  buildFacet('countryChecks', countByCountry(), ACTIVE_COUNTRIES, { truncate: 8, noun: 'l\u00e4nder' });
+  buildFacet('countryChecks', countByCountry(), ACTIVE_COUNTRIES, { alpha: true, noun: 'l\u00e4nder' });
   buildFacet('sortimentChecks', countBy(w => w.sortiment), ACTIVE_SORTIMENT);
 }
 
@@ -1159,12 +1172,11 @@ initDualRange(
     DISCOUNT_MIN = a; DISCOUNT_MAX = b;
     document.getElementById('rabattMinLabel').textContent = Math.round(a);
     document.getElementById('rabattMaxLabel').textContent = Math.round(b);
-    const track = document.getElementById('rabattSlider');
     const fill = document.getElementById('rabattFill');
-    const trackWidth = track.clientWidth;
+    const L0 = parseFloat(fill.style.left) / 100 || 0, W0 = parseFloat(fill.style.width) / 100 || 0;
     fill.style.backgroundImage = 'linear-gradient(to right, #FFC1C1, #FF2E2E, #7A0000)';
-    fill.style.backgroundSize = trackWidth + 'px 100%';
-    fill.style.backgroundPosition = '-' + (parseFloat(fill.style.left) / 100 * trackWidth) + 'px 0';
+    fill.style.backgroundSize = (W0 > 0 ? 100 / W0 : 100) + '% 100%';
+    fill.style.backgroundPosition = (W0 < 1 ? L0 / (1 - W0) * 100 : 0) + '% 0';
     render();
   }
 );
