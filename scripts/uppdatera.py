@@ -23,6 +23,7 @@ REGISTER = os.path.join(ROT, 'data', 'producenter_koordinater.csv')
 ATT_GOOGLA = os.path.join(ROT, 'data', 'att_googla.xlsx')
 STATUS = os.path.join(ROT, 'data', 'README.md')
 INLAMNING = os.path.join(ROT, 'data', 'inlamning')
+FORSALJNING = os.path.join(ROT, 'data', 'forsaljning')   # Systembolagets årliga artikellista (Excel)
 SITE = os.path.join(ROT, '_site')
 MASTER_MAPP = os.path.join(ROT, 'master')
 IDAG = datetime.date.today().isoformat()
@@ -263,7 +264,25 @@ def bygg_master(viner, reg):
     return pd.concat([viner, pd.DataFrame(rader)], axis=1)
 
 
+def läs_försäljning():
+    """Läser den senaste artikellistan i data/forsaljning/ och returnerar ({artikelnr: liter}, år)."""
+    filer = sorted(glob.glob(os.path.join(FORSALJNING, '*.xlsx')))
+    if not filer:
+        print("Ingen försäljningsfil i data/forsaljning/ – hoppar över försäljning.")
+        return {}, None
+    fil = filer[-1]
+    rå = pd.read_excel(fil, header=None)
+    rubrikrad = next(i for i in range(min(15, len(rå))) if 'Artnr' in rå.iloc[i].astype(str).tolist())
+    df = pd.read_excel(fil, header=rubrikrad)
+    df = df[df['Artnr'].notna() & df['Försäljning i liter'].notna()]
+    liter = {str(int(a)): float(l) for a, l in zip(df['Artnr'], df['Försäljning i liter'])}
+    år = ''.join(c for c in os.path.basename(fil) if c.isdigit())[:4] or None
+    print(f"Försäljning: {len(liter)} artiklar från {os.path.basename(fil)}")
+    return liter, år
+
+
 def bygg_data_js(master):
+    försäljning, försäljningsår = läs_försäljning()
     kartan = master[master['Latitud'].notna() & master['producerName'].notna()].copy()
     kartan['_nyckel'] = kartan['producerName'].map(nyckel)
     producenter = []
@@ -287,13 +306,16 @@ def bygg_data_js(master):
                     vin['extrapris']['sedan'] = w['sänkt_datum']
             if w['tillfälligt_slut'] == True:
                 vin['slut'] = True
+            l = försäljning.get(str(w['productNumber']))
+            if l is not None:
+                vin['liter'] = round(l)
             vinlista.append(vin)
         producenter.append({'name': f['producerName'], 'country': ren(f['country']),
                             'lat': float(f['Latitud']), 'lon': float(f['Longitud']),
                             'address': ren(f['Hittad_adress']), 'verified': True,
                             'wines': vinlista, 'wine_count': len(vinlista)})
     senaste = max(w['lanserad'] for p in producenter for w in p['wines'] if w['lanserad'])
-    info = {'uttag': IDAG, 'nyhetsmanad': senaste[:7], 'skapad': IDAG}
+    info = {'uttag': IDAG, 'nyhetsmanad': senaste[:7], 'skapad': IDAG, 'forsaljningsar': försäljningsår}
     print(f"Hemsidan: {len(producenter)} producenter, {sum(len(p['wines']) for p in producenter)} viner, "
           f"nyheter för {senaste[:7]}")
     return ("// Vinografi-data. Skapas automatiskt varje natt av GitHub Actions - redigera inte för hand.\n"
