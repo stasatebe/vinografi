@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Vinografi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -193,7 +193,6 @@
   .contact-form button[type=submit]{display:flex;align-items:center;justify-content:space-between;width:100%;height:100%;padding:0;background:none;border:none;color:var(--ink);font:inherit;font-weight:500;cursor:pointer;}
   .contact-form button[type=submit]:hover{background:var(--bg);}
   .contact-form button[type=submit] .arrow{color:var(--ink-soft);}
-  .contact-hp{display:none;}
   .contact-status{color:var(--ink-soft);}
   .contact-status:not(:empty){padding-bottom:calc(var(--unit)*3);}
   .about-body{padding:calc(var(--unit)*3) calc(var(--unit)*4);}
@@ -286,6 +285,7 @@
     .mobile-search-bar .header-search{max-width:none;}
     .mobile-search-bar .search-results{position:static;max-width:none;margin-top:4px;}
     .header-search{font-size:16px;}
+    .contact-form textarea,.contact-form input[type=email]{font-size:16px;}
 
     .sidebar-wrap{position:static;transform:none;display:contents;}
     #asideFilter, #asideLager{
@@ -484,13 +484,12 @@
         <div class="about-body">
           <p>Hejhej!</p>
           <p>Detta är en karta som visar var olika viner och producenter kommer ifrån!</p>
-          <p>Det här är ett work in progress! Systembolaget har inte koordinater för producenterna, så vi har försökt hitta och placera dem så rätt som möjligt. Det är några tusen producenter, så vissa kan ha hamnat fel.</p>
-          <p>Ser du något som är fel? Säg till, så fixar vi det! Och hittar du något som ser knasigt ut, eller har du ris, ros eller idéer? Hör gärna av dig!</p>
+          <p>Det här är ett work in progress. Systembolaget har inte koordinater för producenterna, så vi har försökt hitta och placera dem så rätt som möjligt. Det är några tusen producenter, så vissa kan ha hamnat fel.</p>
+          <p>Ser du något som är fel? Eller hittar du något som ser knasigt ut, eller har du ris, ros eller idéer? Hör gärna av dig!</p>
           <p>Vi har gjort det här på fritiden, helt gratis och utan spons eller vinstintresse. Hoppas ni tycker det är kul och användbart :)</p>
-          <form class="contact-form" id="contactForm">
-            <textarea id="contactMsg" rows="4" required placeholder="Skriv här! T.ex. en vingård som hamnat fel, något som saknas eller en idé."></textarea>
-            <input id="contactEmail" type="email" placeholder="Din mejl (om du vill ha svar)">
-            <input type="checkbox" name="botcheck" class="contact-hp" tabindex="-1" autocomplete="off">
+          <form class="contact-form" id="contactForm" novalidate>
+            <textarea id="contactMsg" rows="4" required placeholder="Skriv här …"></textarea>
+            <input id="contactEmail" type="email" inputmode="email" autocomplete="email" placeholder="Din mejl (om du vill ha svar)">
             <div class="info-link-row"><button type="submit" id="contactSend"><span>Skicka</span><span class="arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.1"/></svg></span></button></div>
             <div class="contact-status" id="contactStatus"></div>
           </form>
@@ -761,7 +760,7 @@ function setLayer(key) {
   Object.values(LAYERS).forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
   if (map.hasLayer(satTint)) map.removeLayer(satTint);
   LAYERS[key].addTo(map);
-  if (key === 'satellit') { satTint.addTo(map); updateSatelliteTint(); }
+
   activeLayerKey = key;
   applyLabelsOverlay();
   document.querySelectorAll('.layer-pill').forEach(p => p.classList.toggle('active', p.dataset.layer === key));
@@ -1706,29 +1705,36 @@ document.addEventListener('click', (e) => {
 // Fyll i nyckeln från web3forms.com. Utan nyckel öppnas mejlprogrammet i stället.
 const WEB3FORMS_KEY = 'b9ff95d0-ada1-4724-86a2-7086e4eb0895';
 const CONTACT_EMAIL = 'stasatebe@outlook.com';
+// När man skriver: se till att Skicka-knappen syns ovanför tangentbordet och menyn (viktigt på Android)
+document.getElementById('contactForm').addEventListener('focusin', () => {
+  setTimeout(() => document.getElementById('contactSend').scrollIntoView({ block: 'nearest' }), 350);
+});
 document.getElementById('contactForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const msg = document.getElementById('contactMsg').value.trim();
   const email = document.getElementById('contactEmail').value.trim();
   const status = document.getElementById('contactStatus');
-  if (!msg) return;
+  if (!msg) { status.textContent = 'Skriv något först :)'; return; }
   if (!WEB3FORMS_KEY) {
     location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Vinografi') +
       '&body=' + encodeURIComponent(msg + (email ? '\n\n' + email : ''));
     return;
   }
-  if (document.querySelector('.contact-hp').checked) return;
+  const btn = document.getElementById('contactSend');
+  if (btn.disabled) return;
+  btn.disabled = true;
   status.textContent = 'Skickar …';
   fetch('https://api.web3forms.com/submit', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Vinografi: nytt meddelande', from_name: 'Vinografi', message: msg, email: email || undefined, replyto: email || undefined })
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Vinografi: nytt meddelande', from_name: 'Vinografi', message: msg + (email ? '\n\nSvara till: ' + email : ''), replyto: /^\S+@\S+\.\S+$/.test(email) ? email : undefined })
   }).then(r => r.json()).then(d => {
     if (!d.success) throw new Error(d.message || 'fel');
     document.getElementById('contactMsg').value = '';
     document.getElementById('contactEmail').value = '';
     status.textContent = 'Tack! Vi har fått ditt meddelande :)';
     track('Kontakt skickad');
-  }).catch(() => { status.textContent = 'Något gick fel, försök igen om en stund.'; });
+  }).catch(() => { status.textContent = 'Det gick inte att skicka. Försök igen, eller mejla ' + CONTACT_EMAIL + '.'; })
+    .finally(() => { btn.disabled = false; });
 });
 
 const secretMarker = L.circleMarker([59.70603609708796, 14.543204397251872], Object.assign({ renderer: markerRenderer }, markerStyle(null)));
