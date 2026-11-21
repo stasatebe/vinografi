@@ -4,31 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Vinografi</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
 <style>
   :root{
-    --bg:#FAF9F5;
+    --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --bg:#FFFFFF;
     --panel:#FFFFFF;
+    --hover:#F5F5F2;
     --ink:#1E1E19;
-    --ink-soft:#7C7A6E;
-    --line:#E4E1D6;
+    --ink-soft:#8A887E;
+    --line:#E6E5E0;
     --line-strong:#1E1E19;
-    --blue:#3E6478;
-    --unit:8px;
+    --blue:#1E1E19;
+    --water:#C8DBE5;
+    --unit:6px;
     --col:308px;
-    --row-h:48px;
+    --row-h:44px;
     --sub-h:40px;
     --label-h:32px;
     --fs:13px;
     --fs-brand:22px;
+    --pad:24px;
     --header-h:88px;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;font-size:var(--fs);line-height:1.5;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:var(--fs);line-height:1.5;overflow:hidden;-webkit-tap-highlight-color:transparent;}
   a{-webkit-tap-highlight-color:transparent;}
   button,input{font-family:inherit;}
   .app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;}
@@ -156,7 +157,7 @@
   .map-stats b{color:var(--ink);font-weight:500;}
   body.sidebar-closed .map-stats{left:16px;}
   .leaflet-control-scale{margin:0 0 6px!important;}
-  .leaflet-control-scale-line{background:var(--panel);border:1px solid var(--line-strong)!important;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:11px;border-top:none!important;padding:1px 5px;}
+  .leaflet-control-scale-line{background:var(--panel);border:1px solid var(--line-strong)!important;color:var(--ink-soft);font-family:var(--font);font-size:11px;border-top:none!important;padding:1px 5px;}
   .zoom-readout{background:var(--panel);border:1px solid var(--line-strong);padding:2px 7px;font-size:11px;color:var(--ink-soft);}
 
   .explore-bar{position:absolute;left:50%;bottom:calc(var(--unit)*3);transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:calc(var(--unit)*1.5);z-index:600;}
@@ -254,13 +255,13 @@
   .row-link:first-child{border-top:none;}
   .row-link:hover{color:var(--ink);}
 
-  .leaflet-control-attribution{background:rgba(250,249,245,0.75)!important;color:var(--ink-soft)!important;font-family:'Inter',sans-serif!important;font-size:10px!important;padding:1px 6px!important;box-shadow:none!important;}
+  .leaflet-control-attribution{background:rgba(250,249,245,0.75)!important;color:var(--ink-soft)!important;font-family:var(--font)!important;font-size:10px!important;padding:1px 6px!important;box-shadow:none!important;}
   .leaflet-control-attribution a{color:var(--ink-soft)!important;}
 
-  .region-label{background:none;border:none;box-shadow:none;font-family:'Inter',sans-serif;font-weight:500;font-size:11px;color:var(--ink);padding:0;-webkit-text-stroke:3px var(--bg);paint-order:stroke fill;transition:opacity .25s ease;pointer-events:none;}
+  .region-label{background:none;border:none;box-shadow:none;font-family:var(--font);font-weight:500;font-size:11px;color:var(--ink);padding:0;-webkit-text-stroke:3px var(--bg);paint-order:stroke fill;transition:opacity .25s ease;pointer-events:none;}
   .region-label::before{display:none;}
   .region-popup .leaflet-popup-content-wrapper{border-radius:0;border:1px solid var(--line-strong);box-shadow:none;}
-  .region-popup .leaflet-popup-content{margin:calc(var(--unit)*1.5) calc(var(--unit)*2);font-family:'Inter',sans-serif;}
+  .region-popup .leaflet-popup-content{margin:calc(var(--unit)*1.5) calc(var(--unit)*2);font-family:var(--font);}
   .region-popup .leaflet-popup-tip{display:none;}
   .region-popup .rp-name{font-weight:500;font-size:var(--fs);margin:0 0 2px;}
   .region-popup .rp-meta{font-size:12px;color:var(--ink-soft);}
@@ -319,6 +320,71 @@
     .side-panel{position:fixed;width:100%;left:0;right:0;top:auto;bottom:48px;height:auto;max-height:46vh;border-left:none;border-top:1px solid var(--line-strong);transform:translateY(100%);z-index:1100;}
     .side-panel.open{transform:translateY(0);}
   }
+
+  /* ============ DESIGN (nov 2026): vitt, Helvetica, en baslinje, inga rutor i rutor ============
+     Regler: tre textstorlekar (40 logga, 22 vald producent, 13 allt annat).
+     Versaler bara för det som namnger en zon (logga, meny, FILTER, VISA SOM, LAGER, VALD PRODUCENT).
+     Svart = innehåll/valt (understruket), grått = sekundärt/ej valt. Svart linje mellan zoner, grå mellan rader. */
+  html,body{font-family:var(--font);}
+  .caps,.section-label,.panel-topbar > span:first-child{text-transform:uppercase;letter-spacing:0.06em;font-weight:400;}
+  .section-label{color:var(--ink-soft);height:var(--row-h);padding:0 var(--pad);}
+  .clear-filters{font-size:var(--fs);color:var(--ink);text-transform:none;letter-spacing:0;border-bottom:none;text-decoration:underline;text-underline-offset:3px;}
+  .facet-btn,.wine-entry-title,.info-row .v,.info-link-row a,.contact-form button[type=submit],.footer-stats .stat .n{font-weight:400;}
+  .facet-btn{padding:0 var(--pad);}
+  .facet-btn:hover,.wine-entry:hover,.info-link-row a:hover,.contact-form button[type=submit]:hover,.search-result:hover,.map-zoom button:hover{background:var(--hover);}
+  .subrow,.sublink{padding:0 var(--pad) 0 calc(var(--pad) + 16px);}
+  .range-row,.toggle-row,.layer-row,.analys-legend,.info-row,.info-label,.panel-topbar,.footer-stats,.filter-note{padding-left:var(--pad);padding-right:var(--pad);}
+  .info-link-row a,.wine-entry{padding-left:var(--pad);padding-right:var(--pad);}
+  .about-body{padding:calc(var(--unit)*3) var(--pad);}
+  .about-body h2{font-weight:400;}
+  .info-title-row{font-weight:400;font-size:var(--fs-brand);padding:calc(var(--unit)*2) var(--pad);}
+  .wine-entry-sub,.wine-entry-grapes,.wine-entry-meta,.search-result .sr-type,.search-empty{font-size:var(--fs);}
+  .panel-topbar .panel-close{color:var(--ink);}
+  /* Av/På utan rutor: valt läge svart och understruket */
+  .seg-toggle{border:none;height:auto;gap:14px;}
+  .seg-opt,.seg-opt:first-child{font-size:var(--fs);text-transform:none;letter-spacing:0;padding:0;border:none;color:var(--ink-soft);background:none;}
+  .seg-opt.active{background:none;color:var(--ink);font-weight:400;text-decoration:underline;text-underline-offset:3px;}
+  /* Visa som */
+  .layer-row{gap:24px;}
+  .analys-pill,.layer-pill{font-size:var(--fs);font-weight:400;border-bottom:none;padding:0;}
+  .analys-pill.active,.layer-pill.active{font-weight:400;text-decoration:underline;text-underline-offset:3px;}
+  .analys-legend{font-size:var(--fs);}
+  /* Märken i vinlistan: svarta i stället för blå */
+  .wine-entry-badge{color:var(--ink);border-color:var(--ink);}
+  .wine-entry-sale{background:var(--ink);}
+  #map,.map-wrap{background:var(--water);}
+  /* Reglagen: helt svarta fyrkanter utan vit kant, som i skissen */
+  .dr-input::-webkit-slider-thumb{width:9px;height:9px;border:none;box-shadow:none;background:var(--ink);}
+  .dr-input::-moz-range-thumb{width:9px;height:9px;border:none;box-shadow:none;background:var(--ink);}
+  #rabattMin::-webkit-slider-thumb, #rabattMax::-webkit-slider-thumb{background:#7A0000;box-shadow:none;}
+  #rabattMin::-moz-range-thumb, #rabattMax::-moz-range-thumb{background:#7A0000;box-shadow:none;}
+  .dr-fill{height:1px;margin-top:0;}
+
+  @media (min-width: 901px){
+    /* En baslinje för logga, sök och meny. Linjen efter loggan fortsätter som vänsterkolumnens kant. */
+    header{display:flex;align-items:baseline;padding-top:26px;position:relative;}
+    header::after{content:"";position:absolute;left:calc(var(--col) - 1px);top:0;bottom:-1px;border-left:1px solid var(--line-strong);}
+    .wordmark{flex:0 0 var(--col);display:block;border-right:none;padding:0 var(--pad);font-size:40px;font-weight:400;line-height:1;text-transform:uppercase;letter-spacing:0.02em;}
+    .header-search-wrap{flex:1;display:flex;align-items:baseline;gap:16px;padding:0 var(--pad);position:relative;}
+    .search-label{text-transform:uppercase;letter-spacing:0.06em;}
+    .header-search{flex:0 1 520px;max-width:520px;border:none;border-bottom:1px solid var(--line-strong);background:none;padding:0 0 6px;}
+    .header-search:focus{border-color:var(--line-strong);}
+    .header-search::placeholder{color:var(--ink-soft);}
+    .search-results{top:calc(100% + 8px);left:calc(var(--pad) + 42px);right:auto;width:520px;max-width:calc(100% - 90px);}
+    .header-right{display:flex;align-items:baseline;gap:36px;padding:0 var(--pad);border-left:none;}
+    .header-right a{display:inline;height:auto;border-bottom:none;color:var(--ink);text-transform:uppercase;letter-spacing:0.06em;}
+    .header-right a:hover{text-decoration:underline;text-underline-offset:3px;}
+    /* Vänsterkolumnen: inga rutor, bara linjer */
+    .sidebar-wrap{padding:0;background:var(--panel);}
+    aside{border:none;}
+    #asideFilter{margin-bottom:0;}
+    #asideLager{border-top:1px solid var(--line-strong);}
+  }
+  @media (max-width: 900px){
+    .wordmark{text-transform:uppercase;letter-spacing:0.02em;font-weight:400;}
+    .search-label{display:none;}
+    .tab-btn.active{font-weight:400;background:none;box-shadow:inset 0 2px 0 var(--ink);}
+  }
 </style>
 <!-- Besöksstatistik (GoatCounter, utan cookies). Bara du ser siffrorna på vinografi.goatcounter.com -->
 <script data-goatcounter="https://vinografi.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -328,12 +394,13 @@
   <header>
     <div class="wordmark">Vinografi</div>
     <div class="header-search-wrap" id="headerSearchWrap">
-      <input type="text" class="header-search" id="searchInput" placeholder="Sök producent, vin eller region…" autocomplete="off">
+      <label class="search-label" for="searchInput">Sök</label>
+      <input type="text" class="header-search" id="searchInput" placeholder="Producent, vin eller region" autocomplete="off">
       <div class="search-results" id="searchResults"></div>
     </div>
     <div class="header-right">
       <button class="filter-toggle is-open" id="filterToggleBtn">Filter</button>
-      <a href="#" id="randomBtn">Ta mig någonstans</a>
+      <a href="#" id="randomBtn">Ta mig någonstans →</a>
       <a href="#" id="aboutBtn">Om kartan</a>
     </div>
     <div class="header-right-mobile">
@@ -343,7 +410,7 @@
     </div>
   </header>
   <div class="mobile-search-bar" id="mobileSearchBar">
-    <input type="text" class="header-search" id="searchInputM" placeholder="Sök producent, vin eller region…" autocomplete="off">
+    <input type="text" class="header-search" id="searchInputM" placeholder="Sök producent, vin eller region" autocomplete="off">
     <div class="search-results" id="searchResultsM"></div>
   </div>
 
@@ -664,7 +731,10 @@ map.getPane('labelsPane').style.pointerEvents = 'none';
 // Ortnamn och landsgränser ritas från OpenFreeMaps fria kartdata med en egen, avskalad stil.
 // Om det inte går (ingen WebGL eller tjänsten svarar inte) används Esris ortnamn i stället.
 const labelsOverlay = L.layerGroup();
-const LABEL_INK = '#1E1E19', LABEL_HALO = '#FAF9F5';
+const LABEL_INK = '#1E1E19', LABEL_HALO = '#FFFFFF';
+const WATER_COLOR = '#C8DBE5';   // havets färg ovanpå satellitbilden
+const LABEL_LAYER_IDS = ['grans-land', 'namn-by', 'namn-stad', 'namn-storstad', 'namn-land'];
+let glMapLayer = null;
 function esriLabelsFallback() {
   labelsOverlay.clearLayers();
   labelsOverlay.addLayer(L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
@@ -690,6 +760,8 @@ function buildLabelStyle(base) {
     sources: { [srcId]: base.sources[srcId] },
     glyphs: base.glyphs,
     layers: [
+      // Allt vatten i en jämn färg, så att havsdjupet i satellitbilden inte syns
+      { id: 'vatten', type: 'fill', source: srcId, 'source-layer': 'water', paint: { 'fill-color': WATER_COLOR, 'fill-antialias': true } },
       { id: 'grans-land', type: 'line', source: srcId, 'source-layer': 'boundary',
         filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
         paint: { 'line-color': LABEL_HALO, 'line-opacity': 0.55,
@@ -729,8 +801,12 @@ function initLabelsOverlay() {
         style: buildLabelStyle(base), pane: 'labelsPane', interactive: false, renderWorldCopies: true,
         attributionControl: { customAttribution: '&copy; <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }
       });
+      // Lagret ligger alltid kvar (för havets skull). "Gränser & namn" döljer bara texterna och gränserna.
+      glMapLayer = glLayer;
       labelsOverlay.clearLayers();
-      labelsOverlay.addLayer(glLayer);
+      glLayer.addTo(map);
+      const gm = glLayer.getMaplibreMap();
+      if (gm.isStyleLoaded()) applyLabelsOverlay(); else gm.once('load', applyLabelsOverlay);
     })
     .catch(err => { console.warn('Ortnamn från OpenFreeMap kunde inte laddas, använder Esri:', err); esriLabelsFallback(); });
 }
@@ -751,6 +827,11 @@ setLayer('satellit');
 
 function applyLabelsOverlay() {
   const want = document.getElementById('labelsToggle').dataset.val === 'pa';
+  if (glMapLayer) {
+    const gm = glMapLayer.getMaplibreMap();
+    if (gm && gm.getStyle && gm.isStyleLoaded()) LABEL_LAYER_IDS.forEach(id => { if (gm.getLayer(id)) gm.setLayoutProperty(id, 'visibility', want ? 'visible' : 'none'); });
+    return;
+  }
   if (map.hasLayer(labelsOverlay)) map.removeLayer(labelsOverlay);
   if (activeLayerKey === 'karta' || !want) return;
   labelsOverlay.addTo(map);
