@@ -286,7 +286,7 @@
     .mobile-search-bar .header-search{max-width:none;}
     .mobile-search-bar .search-results{position:static;max-width:none;margin-top:4px;}
     .header-search{font-size:16px;}
-    .contact-form textarea,.contact-form input[type=email]{font-size:16px;}
+    .contact-form textarea,.contact-form input[type=email],.facet-search{font-size:16px;}
 
     .sidebar-wrap{position:static;transform:none;display:contents;}
     #asideFilter, #asideLager{
@@ -353,6 +353,37 @@
   .wine-entry-badge{color:var(--ink);border-color:var(--ink);}
   .wine-entry-sale{background:var(--ink);}
   #map,.map-wrap{background:var(--water);}
+  /* Rytm: varje rad är 44 px. Pris, Årgång och Rabatt är två rader (rubrik + reglage) = 88 px. */
+  :root{--sub-h:44px;}
+  .group-start{margin-top:0;}
+  .range-row-head{height:var(--row-h);}
+  .range-row{padding-bottom:12px;}
+  .toggle-row-attached{height:var(--row-h);}
+  .info-label{height:var(--row-h);}
+  .info-title-row{padding-top:16px;padding-bottom:16px;}
+  /* Vinlistan: en textstorlek, samma radavstånd */
+  .wine-entry{padding-top:12px;padding-bottom:12px;}
+  .wine-entry-sub,.wine-entry-grapes,.wine-entry-meta{margin-top:0;line-height:1.5;}
+  /* Märken som vanlig text i stället för små rutor med versaler */
+  .wine-entry-badge,.wine-entry-sale,.wine-entry-reduced,.wine-entry-out{font-size:var(--fs);text-transform:none;letter-spacing:0;border:none;background:none;padding:0;margin-left:10px;}
+  .wine-entry-badge{color:var(--ink-soft);}
+  .wine-entry-sale{color:#7A0000;}
+  .wine-entry-reduced{color:#C1121F;}
+  .wine-entry-out{color:var(--ink-soft);}
+  /* Sökruta i listorna: samma stil som sökfältet i sidhuvudet */
+  .facet-search-row{cursor:default;}
+  .facet-search{width:100%;border:none;border-bottom:1px solid var(--line-strong);border-radius:0;background:none;font:inherit;color:var(--ink);padding:0 0 5px;outline:none;}
+  .facet-search::placeholder{color:var(--ink-soft);}
+  /* Kryssrutor: små fyrkanter som reglagens handtag i stället för webbläsarens egna */
+  .subrow input[type=checkbox]{-webkit-appearance:none;appearance:none;width:9px;height:9px;margin:0;border:1px solid var(--ink);border-radius:0;background:none;flex:0 0 auto;cursor:pointer;}
+  .subrow input[type=checkbox]:checked{background:var(--ink);}
+  /* Samma vikt överallt */
+  .filter-note b,.footer-stats .stat .n,.map-stats b,.explore-caption b{font-weight:400;}
+  /* Diskreta rullningslister */
+  .sidebar-wrap,.facet.open .facet-body,.side-panel,.sheet-scroll{scrollbar-width:thin;scrollbar-color:#DAD9D3 transparent;}
+  .sidebar-wrap::-webkit-scrollbar,.facet-body::-webkit-scrollbar,.side-panel::-webkit-scrollbar,.sheet-scroll::-webkit-scrollbar{width:4px;}
+  .sidebar-wrap::-webkit-scrollbar-thumb,.facet-body::-webkit-scrollbar-thumb,.side-panel::-webkit-scrollbar-thumb,.sheet-scroll::-webkit-scrollbar-thumb{background:#DAD9D3;}
+  .sidebar-wrap::-webkit-scrollbar-button,.facet-body::-webkit-scrollbar-button,.side-panel::-webkit-scrollbar-button,.sheet-scroll::-webkit-scrollbar-button{display:none;height:0;}
   /* Reglagen: helt svarta fyrkanter utan vit kant, som i skissen */
   .dr-input::-webkit-slider-thumb{width:9px;height:9px;border:none;box-shadow:none;background:var(--ink);}
   .dr-input::-moz-range-thumb{width:9px;height:9px;border:none;box-shadow:none;background:var(--ink);}
@@ -384,6 +415,7 @@
     .wordmark{text-transform:uppercase;letter-spacing:0.02em;font-weight:400;}
     .search-label{display:none;}
     .tab-btn.active{font-weight:400;background:none;box-shadow:inset 0 2px 0 var(--ink);}
+    .facet-search{font-size:16px;}
   }
 </style>
 <!-- Besöksstatistik (GoatCounter, utan cookies). Bara du ser siffrorna på vinografi.goatcounter.com -->
@@ -963,7 +995,7 @@ function producerHtml(p) {
   const streetViewUrl = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + p.lat + ',' + p.lon;
   html += '<div class="info-link-row"><a href="' + streetViewUrl + '" target="_blank" rel="noopener"><span>Se p\u00e5 gatuniv\u00e5</span><span class="arrow">' + ARROW_SVG + '</span></a></div>';
   if (matching.length < p.wine_count) {
-    html += '<div class="filter-note"><span>Visar <b>' + matching.length + ' av ' + p.wine_count + '</b> viner \u2013 filter \u00e4r aktiva</span>' +
+    html += '<div class="info-row"><span class="l">Visar ' + matching.length + ' av ' + p.wine_count + ' viner</span>' +
       '<button class="clear-filters" onclick="clearFilters()">Rensa filter</button></div>';
   } else {
     html += '<div class="info-row"><span class="l">Antal viner</span><span class="v">' + p.wine_count + '</span></div>';
@@ -1181,12 +1213,11 @@ function buildFacet(containerId, counts, activeSet, opts) {
   let searchInput = null;
   if (opts.searchable) {
     const searchWrap = document.createElement('div');
-    searchWrap.className = 'subrow';
-    searchWrap.style.padding = '0 ' + 'calc(var(--unit)*4)';
+    searchWrap.className = 'subrow facet-search-row';
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = 'S\u00f6k ' + (opts.noun || '') + '\u2026';
-    input.style.cssText = 'width:100%;border:1px solid var(--line-strong);background:var(--panel);font-family:inherit;font-size:16px;padding:5px 8px;color:var(--ink);';
+    input.className = 'facet-search';
+    input.placeholder = 'S\u00f6k ' + (opts.noun || '');
     searchInput = input;
     input.addEventListener('input', () => renderList(input.value));
     input.addEventListener('click', (e) => e.stopPropagation());
