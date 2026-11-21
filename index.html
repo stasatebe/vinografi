@@ -185,6 +185,17 @@
   .info-link-row a{display:flex;align-items:center;justify-content:space-between;height:100%;padding:0 calc(var(--unit)*4);color:var(--ink);text-decoration:none;font-weight:500;}
   .info-link-row a:hover,.info-link-row a:active{background:var(--bg);}
   .info-link-row a .arrow{color:var(--ink-soft);font-weight:400;}
+  .contact-form{border-top:1px solid var(--line);}
+  .contact-form textarea,.contact-form input[type=email]{display:block;width:100%;box-sizing:border-box;border:none;border-bottom:1px solid var(--line);border-radius:0;background:var(--panel);color:var(--ink);font:inherit;padding:calc(var(--unit)*3) 0;resize:vertical;outline:none;}
+  .contact-form textarea:focus,.contact-form input[type=email]:focus{background:var(--bg);}
+  .contact-form textarea::placeholder,.contact-form input::placeholder{color:var(--ink-soft);}
+  .contact-form .info-link-row{border-top:none;}
+  .contact-form button[type=submit]{display:flex;align-items:center;justify-content:space-between;width:100%;height:100%;padding:0;background:none;border:none;color:var(--ink);font:inherit;font-weight:500;cursor:pointer;}
+  .contact-form button[type=submit]:hover{background:var(--bg);}
+  .contact-form button[type=submit] .arrow{color:var(--ink-soft);}
+  .contact-hp{display:none;}
+  .contact-status{color:var(--ink-soft);}
+  .contact-status:not(:empty){padding-bottom:calc(var(--unit)*3);}
   .about-body{padding:calc(var(--unit)*3) calc(var(--unit)*4);}
   .about-body h2{font-size:var(--fs-brand);font-weight:600;margin:0 0 calc(var(--unit)*2);}
   .about-body p{margin:0 0 calc(var(--unit)*2.5);}
@@ -205,8 +216,6 @@
   .wine-entry-grapes{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;}
   .wine-entry-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
   .wine-entry-badge{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--blue);border:1px solid var(--blue);padding:1px 5px;margin-left:calc(var(--unit)*1);}
-  .analys-section{display:none;}
-  body.analys-unlocked .analys-section{display:block;}
   .analys-pill{color:var(--ink-soft);cursor:pointer;padding:0 0 2px;background:none;border:none;border-bottom:1px solid transparent;font-family:inherit;font-size:11.5px;white-space:nowrap;flex:0 0 auto;}
   .analys-pill.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink);}
   .analys-sub{display:none;}
@@ -311,6 +320,8 @@
     .side-panel.open{transform:translateY(0);}
   }
 </style>
+<!-- Besöksstatistik (GoatCounter, utan cookies). Bara du ser siffrorna på vinografi.goatcounter.com -->
+<script data-goatcounter="https://vinografi.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="app">
@@ -415,13 +426,21 @@
     <aside id="asideLager">
       <div class="panel-topbar aside-topbar"><span>Lager</span><button class="panel-close" id="lagerClose">Stäng ✕</button></div>
       <div class="sheet-scroll">
+        <div class="section analys-section" id="analysSection">
+          <div class="section-label"><span class="sl-text">Visa som</span></div>
+          <div class="layer-row" id="analysModeRow">
+            <button class="analys-pill active" data-mode="producenter">Producenter</button>
+            <button class="analys-pill" data-mode="forsaljning">Försäljning</button>
+            <button class="analys-pill" data-mode="rutor">Rutor</button>
+          </div>
+          <div class="layer-row analys-sub" id="analysByRow">
+            <button class="analys-pill active" data-by="typ">Vintyp</button>
+            <button class="analys-pill" data-by="druva">Druva</button>
+          </div>
+          <div class="analys-legend" id="analysLegend"></div>
+        </div>
         <div class="section">
           <div class="section-label" id="lagerSectionLabel"><span class="sl-text">Lager</span></div>
-          <div class="layer-row" id="layerRow">
-            <button class="layer-pill active" data-layer="satellit">Satellit</button>
-            <button class="layer-pill" data-layer="karta">Karta</button>
-            <button class="layer-pill" data-layer="terrang">Terräng</button>
-          </div>
           <div class="toggle-row">
             <span class="l">Gränser &amp; namn</span>
             <div class="seg-toggle" id="labelsToggle" data-val="pa">
@@ -436,19 +455,6 @@
               <button class="seg-opt" data-val="pa">På</button>
             </div>
           </div>
-        </div>
-        <div class="section analys-section" id="analysSection">
-          <div class="section-label"><span class="sl-text">Analys</span></div>
-          <div class="layer-row" id="analysModeRow">
-            <button class="analys-pill active" data-mode="producenter">Producenter</button>
-            <button class="analys-pill" data-mode="forsaljning">Försäljning</button>
-            <button class="analys-pill" data-mode="rutor">Rutor</button>
-          </div>
-          <div class="layer-row analys-sub" id="analysByRow">
-            <button class="analys-pill active" data-by="typ">Vintyp</button>
-            <button class="analys-pill" data-by="druva">Druva</button>
-          </div>
-          <div class="analys-legend" id="analysLegend"></div>
         </div>
       </div>
     </aside>
@@ -481,7 +487,13 @@
           <p>Det här är ett work in progress! Systembolaget har inte koordinater för producenterna, så vi har försökt hitta och placera dem så rätt som möjligt. Det är några tusen producenter, så vissa kan ha hamnat fel.</p>
           <p>Ser du något som är fel? Säg till, så fixar vi det! Och hittar du något som ser knasigt ut, eller har du ris, ros eller idéer? Hör gärna av dig!</p>
           <p>Vi har gjort det här på fritiden, helt gratis och utan spons eller vinstintresse. Hoppas ni tycker det är kul och användbart :)</p>
-          <div class="info-link-row"><a href="mailto:stasatebe@outlook.com?subject=Feedback%20p%C3%A5%20Vinografi"><span>Kontakta oss</span><span class="arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.1"/></svg></span></a></div>
+          <form class="contact-form" id="contactForm">
+            <textarea id="contactMsg" rows="4" required placeholder="Skriv här! T.ex. en vingård som hamnat fel, något som saknas eller en idé."></textarea>
+            <input id="contactEmail" type="email" placeholder="Din mejl (om du vill ha svar)">
+            <input type="checkbox" name="botcheck" class="contact-hp" tabindex="-1" autocomplete="off">
+            <div class="info-link-row"><button type="submit" id="contactSend"><span>Skicka</span><span class="arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" stroke-width="1.1"/></svg></span></button></div>
+            <div class="contact-status" id="contactStatus"></div>
+          </form>
           <div class="cite">Vinregioner: Candiago, S., Tscholl, S., Bassani, L., Fraga, H., Egarter Vigl, L. (2022). A geospatial inventory of regulatory information for wine Protected Designations of Origin in Europe. Scientific Data 9, 394. CC BY 4.0.</div>
         </div>
       </div>
@@ -614,7 +626,7 @@ let VINT_MIN = VINTAGE_MIN, VINT_MAX = VINTAGE_MAX;
 let INCLUDE_NO_VINTAGE = true;
 let DISCOUNT_MIN = 0, DISCOUNT_MAX = DISCOUNT_BOUND_MAX;
 let CURRENT_FILTERED = [];
-let ANALYS_UNLOCKED = false, ANALYS_MODE = 'producenter', RUTOR_BY = 'typ';
+let ANALYS_UNLOCKED = true, ANALYS_MODE = 'producenter', RUTOR_BY = 'typ';
 let LITERS_CACHE = new Map();
 let GRID_DOMINANT = [], GRID_READY = false;
 let markerByName = new Map();
@@ -846,7 +858,7 @@ function wineEntry(w) {
   if (showSale) { meta.push(w.extrapris.old + '\u2192' + w.extrapris.new + ' kr'); }
   else if (w.pris) { meta.push(w.pris + ' kr'); }
   if (w.sortiment) meta.push(w.sortiment);
-  if (ANALYS_UNLOCKED && w.liter != null) meta.push(fmtNum(w.liter) + ' l s\u00e5lt ' + (DATA_INFO.forsaljningsar || ''));
+  if (ANALYS_MODE === 'forsaljning' && w.liter != null) meta.push(fmtNum(w.liter) + ' l s\u00e5lt ' + (DATA_INFO.forsaljningsar || ''));
   const SHOW_PRODUCT_IMAGES = false; // see chat: Systembolaget's API terms reserve product images as their IP
   const thumb = (SHOW_PRODUCT_IMAGES && w.image)
     ? '<img class="wine-thumb" src="' + escapeHtml(w.image) + '_400.png" loading="lazy" alt="" onerror="this.style.display=\'none\'">'
@@ -923,6 +935,7 @@ document.getElementById('filterClose').addEventListener('click', () => { if (mob
 document.getElementById('lagerClose').addEventListener('click', () => { if (mobileTab === 'lager') closeAllMobilePanels(); });
 
 function selectProducer(p, marker) {
+  track('Producent: ' + p.name);
   deselectMarker();
   selectedMarker = marker; selectedProducer = p;
   marker.setStyle(selectedMarkerStyle(p));
@@ -1444,11 +1457,6 @@ function wireSearch(inputId, resultsId, onSelect) {
     results.appendChild(row);
   }
   input.addEventListener('input', () => {
-    if (input.value.trim().toLowerCase() === 'ulfegay') {
-      input.value = ''; results.innerHTML = ''; results.classList.remove('open'); input.blur();
-      setAnalysUnlocked(!ANALYS_UNLOCKED);
-      return;
-    }
     const groups = runSearch(input.value);
     results.innerHTML = '';
     if (input.value.trim().length >= 2) {
@@ -1650,6 +1658,7 @@ function updateAnalys() {
 }
 function setAnalysMode(mode) {
   ANALYS_MODE = mode;
+  track('Visa som: ' + mode);
   document.querySelectorAll('#analysModeRow .analys-pill').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
   map.closePopup();
   deselectMarker();
@@ -1671,6 +1680,56 @@ function setAnalysUnlocked(unlocked) {
   deselectMarker();
   render();
 }
+
+// ---------------- STATISTIK (GoatCounter) ----------------
+// Klick räknas som händelser och syns under "Pages" på vinografi.goatcounter.com.
+function track(name) {
+  try {
+    if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name.slice(0, 200), title: name.slice(0, 200), event: true });
+  } catch (e) {}
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest && e.target.closest('a[href]');
+  if (!a) return;
+  if (a.href.includes('systembolaget.se')) {
+    const t = a.querySelector('.wine-entry-title');
+    const wine = t && t.firstChild ? t.firstChild.textContent.trim() : a.href;
+    track('Systembolaget: ' + wine + (selectedProducer ? ' (' + selectedProducer.name + ')' : ''));
+  } else if (a.href.includes('google.com/maps')) {
+    track('Gatuvy: ' + (selectedProducer ? selectedProducer.name : ''));
+  } else if (a.id === 'randomBtn' || a.id === 'randomBtnM') {
+    track('Ta mig någonstans');
+  }
+}, true);
+
+// ---------------- KONTAKT (Web3Forms) ----------------
+// Fyll i nyckeln från web3forms.com. Utan nyckel öppnas mejlprogrammet i stället.
+const WEB3FORMS_KEY = 'b9ff95d0-ada1-4724-86a2-7086e4eb0895';
+const CONTACT_EMAIL = 'stasatebe@outlook.com';
+document.getElementById('contactForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('contactMsg').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const status = document.getElementById('contactStatus');
+  if (!msg) return;
+  if (!WEB3FORMS_KEY) {
+    location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Vinografi') +
+      '&body=' + encodeURIComponent(msg + (email ? '\n\n' + email : ''));
+    return;
+  }
+  if (document.querySelector('.contact-hp').checked) return;
+  status.textContent = 'Skickar …';
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Vinografi: nytt meddelande', from_name: 'Vinografi', message: msg, email: email || undefined, replyto: email || undefined })
+  }).then(r => r.json()).then(d => {
+    if (!d.success) throw new Error(d.message || 'fel');
+    document.getElementById('contactMsg').value = '';
+    document.getElementById('contactEmail').value = '';
+    status.textContent = 'Tack! Vi har fått ditt meddelande :)';
+    track('Kontakt skickad');
+  }).catch(() => { status.textContent = 'Något gick fel, försök igen om en stund.'; });
+});
 
 const secretMarker = L.circleMarker([59.70603609708796, 14.543204397251872], Object.assign({ renderer: markerRenderer }, markerStyle(null)));
 secretMarker.addTo(map);
